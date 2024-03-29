@@ -1,0 +1,6 @@
+eval_resnet50-stdAugm_bs256 model testing on...
+testset,accuracy,avg precision,f1 score,roc score,recall,precision
+PNDM,1.0,1.0,1.0,1.0,1.0,1.0
+DDPM,1.0,1.0,1.0,1.0,1.0,1.0
+LDM,0.502,0.7280797170754816,0.00796812749003984,0.7367840000000001,1.0,0.004
+ProGAN,0.5,0.7257827436074147,0.0,0.7731049999999999,0.0,0.0

@@ -1,0 +1,6 @@
+eval_efficientnet-ProGAN-LDM-DDPM-PNDM_bs256 model testing on...
+testset,accuracy,avg precision,f1 score,roc score,recall,precision
+PNDM,1.0,1.0,1.0,1.0,1.0,1.0
+DDPM,1.0,1.0,1.0,1.0,1.0,1.0
+LDM,1.0,1.0,1.0,1.0,1.0,1.0
+ProGAN,1.0,1.0,1.0,1.0,1.0,1.0

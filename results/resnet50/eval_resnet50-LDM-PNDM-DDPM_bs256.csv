@@ -1,0 +1,6 @@
+eval_resnet50-LDM-PNDM-DDPM_bs256 model testing on...
+testset,accuracy,avg precision,f1 score,roc score,recall,precision
+PNDM,1.0,1.0,1.0,1.0,1.0,1.0
+DDPM,1.0,1.0,1.0,1.0,1.0,1.0
+LDM,1.0,1.0,1.0,1.0,1.0,1.0
+ProGAN,0.5005,0.7126736391493851,0.001998001998001998,0.730274,1.0,0.001
