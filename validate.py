@@ -13,10 +13,12 @@ def validate(model, opt, __type):
     with torch.no_grad():
         y_true, y_pred = [], []
         for img, label in data_loader:
+            # --------------------------------------------------------------------------------
             try:
                 in_tens = img.cuda()
             except AssertionError:
                 in_tens = img
+            # --------------------------------------------------------------------------------
             y_pred.extend(model(in_tens).sigmoid().flatten().tolist())
             y_true.extend(label.flatten().tolist())
 

@@ -8,6 +8,8 @@ from networks.resnet import resnet50
 import torchvision.models as models
 import torch.nn as nn
 from networks.custom_models import *
+from deepfake_detector import Detector
+from data import create_dataloader
 #-----------–-----------–-----------–--------
 from options.test_options import TestOptions
 from eval_config import *
@@ -57,6 +59,28 @@ def evaluation(model_path, name, opt):
     with open(csv_name, 'w') as f:
         csv_writer = csv.writer(f, delimiter=',')
         csv_writer.writerows(rows)
+
+
+def eval_multiple():
+
+    rows = [["{} model testing on...".format(opt.name)],
+            ['testset', 'accuracy', 'avg precision', "f1 score", "roc score", "recall", "precision"]]
+
+    print("{} model testing on...".format(opt.name))
+
+    # ---------------------------------------------------------------------
+    opt.models = ["real", "PNDM", "DDPM", "LDM", "ProGAN"]
+    list_models = opt.models
+    list_models.remove("real")
+
+    detector = Detector()
+    data_loader = create_dataloader(opt, "test_list")
+    y_true, y_pred = detector.synth_real_detector(data_loader)
+    acc, ap, r_acc, f_acc, f1, auc, prec, recall, _, _ = detector.return_metrics(y_true, y_pred)
+
+    rows.append([test_model, acc, ap, f1, auc, prec, recall])
+    print("({}) acc: {}; ap: {}; r_acc: {}; f_acc: {} f1: {}; roc_auc: {}; recall: {}; precision: {}".format(test_model, acc, ap, r_acc, f_acc, f1, auc, recall, prec))
+
 
 
 if __name__ == "__main__":
