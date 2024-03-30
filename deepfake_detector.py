@@ -4,52 +4,98 @@ import torch
 from networks.custom_models import *
 from sklearn.metrics import average_precision_score, precision_recall_curve, accuracy_score, f1_score, roc_auc_score, precision_score, recall_score
 
+
+def load_model(path):
+    truncs = path.split('_')
+    model, _type, trained_on = truncs[0], truncs[1], truncs[2]
+
+    if _type == "inter#64":
+        add = True
+    else:
+        add = False
+
+    if model == "res50":
+        net = ResNet50(add_intermediate_layer=add)
+    elif model == "vgg16":
+        net = VGG16(add_intermediate_layer=add)
+    elif model == "efficient":
+        net = EfficientNet(add_intermediate_layer=add)
+    
+    return net
+
+
+def voting_prediction(list_of_predictions):
+
+    list_of_predictions = list_of_predictions.T
+
+    image_score = []
+
+    for i in range(list_of_predictions.shape[0]):
+        score = max(list_of_predictions[i, :])
+        image_score.append(score)
+
+    return np.array(image_score)
+
+
 class Detector():
 
-    def __init__(self, path_list_models: str):
+    def __init__(self, list_path_models: str):
 
         self.device = torch.device('cuda:0') if torch.cuda.is_available() else torch.device('cpu')
 
         self.nets = []
         
-        for i, model in enumerate(os.listdir(path_list_models)):
-            model_path = os.path.join(path_list_models, model)
-            print(f'Loading model {model}...')
+        for i, model_path in enumerate(list_path_models):
 
-            net = VGG16(num_classes=1)
+            print(f'Loading model {model_path.split("/")[-2]}...')
+
+            net = load_model(model_path.split('/')[-2])
             state_dict = torch.load(model_path, map_location='cpu')
             net.load_state_dict(state_dict['model'])
 
             net.cuda().eval()
 
-            print('model loaded!\n')
-
             self.nets += [net]
 
     def synth_real_detector(self, data_loader):
         
-        y_true, y_pred = [], []
+        y_true, y_pred_array = [], []
 
         with torch.no_grad():    
+            
+            for net_idx, net in enumerate(self.nets):
+                y_pred_temp = []
 
-            for img, label in data_loader:
-                
-                y_true.extend(label.flatten().tolist())
-                img_net_scores = []
+                for img, label in data_loader:
 
-                for net_idx, net in enumerate(self.nets):
+                    if net_idx == 0:
+                        y_true.extend(label.flatten().tolist())
+
                     in_tens = img.cuda()
+                    y_pred_temp.extend(np.array(net(in_tens).sigmoid().flatten().tolist()))
 
-                    pred_temp = (net(in_tens).sigmoid().flatten().tolist())
-                    pred_temp_bin = pred_temp > 0.5
+                y_pred_array.append(np.array(y_pred_temp))
 
-                    maj_voting = np.any(pred_temp_bin).astype(int)
-                    scores_maj_voting = pred_temp[:, maj_voting]
-                    img_net_scores.append(np.nanmax(scores_maj_voting) if maj_voting == 1 else -np.nanmax(scores_maj_voting))
+        y_true = np.array(y_true)
+        y_pred = voting_prediction(np.array(y_pred_array))
 
-                y_pred.extend(np.mean(img_net_scores))
+            # for img, label in data_loader:
+                
+            #     y_true.extend(label.flatten().tolist())
+            #     img_net_scores = []
 
-        y_true, y_pred = np.array(y_true), np.array(y_pred)
+            #     for net_idx, net in enumerate(self.nets):
+            #         print(net_idx)
+            #         in_tens = img.cuda()
+            #         pred_temp = np.array(net(in_tens).sigmoid().flatten().tolist())
+            #         pred_temp_bin = pred_temp > 0.5
+
+            #         maj_voting = np.any(pred_temp_bin).astype(int)
+            #         scores_maj_voting = pred_temp[maj_voting]
+            #         img_net_scores.extend(np.nanmax(scores_maj_voting) if maj_voting == 1 else -np.nanmax(scores_maj_voting))
+                
+            #     print(img_net_scores)
+            #     y_pred.extend(np.mean(img_net_scores))
 
         return y_true, y_pred
     
