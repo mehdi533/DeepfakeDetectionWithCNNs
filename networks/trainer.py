@@ -19,6 +19,12 @@ class Trainer(BaseModel):
 
         if self.isTrain and not opt.continue_train:
             # ------------------------------------------------------------------------
+            if opt.arch == 'res50':
+                self.model = ResNet50()
+            if opt.arch == 'vgg16':
+                self.model = VGG16()
+            if opt.arch == 'efficient':
+                self.model = EfficientNet()
             # self.model = EfficientNet(num_classes=2)
             # self.model = VGG16()
             # self.model = models.efficientnet_b0(pretrained=True)
@@ -31,7 +37,9 @@ class Trainer(BaseModel):
             # self.model = resnet50(pretrained=True)
             # self.model.fc = nn.Linear(2048, 1)
             # torch.nn.init.normal_(self.model.fc.weight.data, 0.0, opt.init_gain)
-            self.model=EfficientNet()
+            # self.model=EfficientNet()
+            # self.model=VGG16()
+            # self.model=ResNet50()
             #-------------------------------------------------------------------------
 
         if not self.isTrain or opt.continue_train:

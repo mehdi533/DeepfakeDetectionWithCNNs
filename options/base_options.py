@@ -43,6 +43,7 @@ class BaseOptions():
         # -------------------------------------------------------------------------------------------
         parser.add_argument('--metadata', type=str, default='', help='directory with list of real/fake images')
         parser.add_argument('--models', default='real', help='models to take into account')
+        parser.add_argument('--filename', default='', help='filename to save')
         # -------------------------------------------------------------------------------------------
         self.initialized = True
         return parser
@@ -77,7 +78,12 @@ class BaseOptions():
         print(message)
 
         # save to the disk
-        expr_dir = os.path.join(opt.checkpoints_dir, opt.name)
+        # -----------------------------------------------------------------
+        # expr_dir = os.path.join(opt.checkpoints_dir, opt.name)
+        mod = "-".join(map(str, opt.models.split(',')[1:]))
+        expr_dir = os.path.join(opt.checkpoints_dir, opt.arch+'_'+opt.name+'_'+ mod)
+        # -----------------------------------------------------------------
+
         util.mkdirs(expr_dir)
         file_name = os.path.join(expr_dir, 'opt.txt')
         with open(file_name, 'wt') as opt_file:
@@ -120,6 +126,8 @@ class BaseOptions():
             raise ValueError("Shouldn't have more than 2 values for --jpg_qual.")
         # ------------------------------------------------------------------------
         opt.models = opt.models.split(',')
+        mod = "-".join(map(str, opt.models[1:]))
+        opt.filename = opt.arch+'_'+opt.name+'_'+ mod
         # ------------------------------------------------------------------------
         self.opt = opt
         return self.opt
