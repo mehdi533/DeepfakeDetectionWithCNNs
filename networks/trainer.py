@@ -28,9 +28,10 @@ class Trainer(BaseModel):
             # self.model.fc = nn.Linear(4096, 1)
             # num_features = self.model.classifier[6].in_features  # Usually 4096 for VGG16
             # self.model.classifier[6] = nn.Linear(num_features, 1)
-            self.model = resnet50(pretrained=True)
-            self.model.fc = nn.Linear(2048, 1)
-            torch.nn.init.normal_(self.model.fc.weight.data, 0.0, opt.init_gain)
+            # self.model = resnet50(pretrained=True)
+            # self.model.fc = nn.Linear(2048, 1)
+            # torch.nn.init.normal_(self.model.fc.weight.data, 0.0, opt.init_gain)
+            self.model=EfficientNet()
             #-------------------------------------------------------------------------
 
         if not self.isTrain or opt.continue_train:
