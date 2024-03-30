@@ -29,8 +29,8 @@ class Trainer(BaseModel):
             # num_features = self.model.classifier[6].in_features  # Usually 4096 for VGG16
             # self.model.classifier[6] = nn.Linear(num_features, 1)
             self.model = resnet50(pretrained=True)
-            # self.model.fc = nn.Linear(2048, 1)
-            # torch.nn.init.normal_(self.model.fc.weight.data, 0.0, opt.init_gain)
+            self.model.fc = nn.Linear(2048, 1)
+            torch.nn.init.normal_(self.model.fc.weight.data, 0.0, opt.init_gain)
             #-------------------------------------------------------------------------
 
         if not self.isTrain or opt.continue_train:
@@ -82,7 +82,7 @@ class Trainer(BaseModel):
         self.forward()
         # -------------------------------------------
         # self.loss = self.loss_fn(self.output.squeeze(1), self.label)
-        self.loss = self.loss_fn(self.output.squeeze(1), self.label.long())
+        self.loss = self.loss_fn(self.output.squeeze(1), self.label)
         # -------------------------------------------
         self.optimizer.zero_grad()
         self.loss.backward()
