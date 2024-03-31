@@ -14,6 +14,7 @@ ImageFile.LOAD_TRUNCATED_IMAGES = True
 # -------------------------------------------------------------------------------------------
 
 import torch
+from torch.utils.data import ConcatDataset
 
 class DatasetFromMetadata(torch.utils.data.Dataset):
     def __init__(self, data_list, transform=None):
@@ -42,8 +43,40 @@ def get_dataset_metadata(opt, image_list):
         transforms.ToTensor(),
         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
     ])
-    return DatasetFromMetadata(image_list, transform)
 
+    dataset = DatasetFromMetadata(image_list, transform)
+
+    if opt.blurring:
+        print("Blurring Active")
+        transform_blur = transforms.Compose([transforms.Lambda(lambda img: blurring(img, opt)), transform])
+        dataset = ConcatDataset([dataset, DatasetFromMetadata(image_list, transform_blur)])
+    
+    if opt.compression:
+        print("Compression Active")
+        transform_comp = transforms.Compose([transforms.Lambda(lambda img: compressing(img, opt)), transform])
+        dataset = ConcatDataset([dataset, DatasetFromMetadata(image_list, transform_comp)])
+
+    return dataset
+
+
+def compressing(img, opt):
+    img = np.array(img)
+
+    method = sample_discrete(opt.jpg_method)
+    qual = sample_discrete(opt.jpg_qual)
+    img = jpeg_from_key(img, qual, method)
+
+    return Image.fromarray(img)
+
+
+def blurring(img, opt):
+    img = np.array(img)
+
+    if random() < opt.blur_prob:
+        sig = sample_continuous(opt.blur_sig)
+        gaussian_blur(img, sig)
+    
+    return Image.fromarray(img)
 
 # -------------------------------------------------------------------------------------------
 

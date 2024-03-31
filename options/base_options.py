@@ -21,6 +21,10 @@ class BaseOptions():
         parser.add_argument('--jpg_prob', type=float, default=0)
         parser.add_argument('--jpg_method', default='cv2')
         parser.add_argument('--jpg_qual', default='75')
+        # -------------------------------------------------------------------------------------------
+        parser.add_argument('--compression', type=int, default=0)
+        parser.add_argument('--blurring', type=int, default=0)
+        # -------------------------------------------------------------------------------------------
 
         parser.add_argument('--dataroot', default='./dataset/', help='path to images (should have subfolders trainA, trainB, valA, valB, etc)')
         parser.add_argument('--classes', default='', help='image classes to train on')
@@ -110,8 +114,8 @@ class BaseOptions():
             id = int(str_id)
             if id >= 0:
                 opt.gpu_ids.append(id)
-#        if len(opt.gpu_ids) > 0:
-#            torch.cuda.set_device(opt.gpu_ids[0])
+        if len(opt.gpu_ids) > 0:
+            torch.cuda.set_device(opt.gpu_ids[0])
 
 
         # additional
