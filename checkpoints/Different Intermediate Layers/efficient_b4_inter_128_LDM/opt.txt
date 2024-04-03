@@ -22,7 +22,7 @@
                 init_gain: 0.02                          
                 init_type: normal                        
              intermediate: 1                             	[default: 0]
-         intermediate_dim: 8                             	[default: 64]
+         intermediate_dim: 128                           	[default: 64]
                   isTrain: True                          	[default: None]
                jpg_method: cv2,pil                       	[default: cv2]
                  jpg_prob: 0                             
@@ -34,7 +34,7 @@
                  metadata: ./dataset/Metadata/           	[default: ]
                      mode: binary                        
                    models: real,LDM                      	[default: real]
-                     name: inter_16                      	[default: experiment_name]
+                     name: inter_128                     	[default: experiment_name]
                 new_optim: False                         
                     niter: 10000                         
                   no_flip: False                         
@@ -48,5 +48,5 @@
                    suffix:                               
               train_split: train                         
                 val_split: val                           
-time is: 2024-04-03 15:31:51.883703
+time is: 2024-04-03 18:12:58.017833
 ----------------- End -------------------

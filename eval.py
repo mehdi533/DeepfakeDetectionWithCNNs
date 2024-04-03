@@ -28,7 +28,7 @@ def evaluation(model_path, name, opt):
     list_models = opt.models
     list_models.remove("real")
     
-    model = return_model(name.split('_')[0], ("inter#64" in name))
+    model = return_model(opt.arch, 1, opt.intermediate_dim)
         
     state_dict = torch.load(model_path, map_location='cpu')
     model.load_state_dict(state_dict['model'])
@@ -40,7 +40,7 @@ def evaluation(model_path, name, opt):
         #opt.dataroot = '{}/{}'.format(dataroot, val)
         #opt.classes = os.listdir(opt.dataroot) if multiclass[v_id] else ['']
         #opt.classes = [0, 1]
-    # ---------------------------------------------------------------------
+        # ---------------------------------------------------------------------
         opt.no_resize = True    # testing without resizing by default
         opt.models = [test_model, "real"]
         # model = resnet50(num_classes=1)
@@ -49,7 +49,6 @@ def evaluation(model_path, name, opt):
         # model.classifier[1] = nn.Linear(num_ftrs, 1)
         # model.fc = nn.Linear(2048, 1)
         # model = models.vgg16(num_classes=1)
-        
         # ---------------------------------------------------------------------
         acc, ap, r_acc, f_acc, f1, auc, prec, recall, _, _ = validate(model, opt, "test_list")
         rows.append([test_model, acc, ap, f1, auc, prec, recall])

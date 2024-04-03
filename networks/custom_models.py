@@ -33,7 +33,7 @@ class EfficientNet_b0(nn.Module):
     
 
 class EfficientNet_b4(nn.Module):
-    def __init__(self, num_classes=1, init_gain=0.02, intermediate_dim=64, add_intermediate_layer=True):
+    def __init__(self, num_classes=1, init_gain=0.02, intermediate_dim=64, add_intermediate_layer=False):
         super(EfficientNet_b4, self).__init__()
     
         self.model = models.efficientnet_b4(weights=EfficientNet_B4_Weights.DEFAULT)
@@ -41,6 +41,7 @@ class EfficientNet_b4(nn.Module):
         num_ftrs = self.model.classifier[1].in_features
 
         if add_intermediate_layer:
+            print("Adding intermediate layer...")
             self.intermediate_layer = nn.Linear(num_ftrs, intermediate_dim)
             
             self.model.classifier[1] = nn.Sequential(

@@ -5,15 +5,17 @@ from networks.custom_models import *
 from sklearn.metrics import average_precision_score, precision_recall_curve, accuracy_score, f1_score, roc_auc_score, precision_score, recall_score
 
 
-def return_model(model, add):
+def return_model(model, add, dim):
     if model == "res50":
-        return ResNet50(add_intermediate_layer=add)
+        return ResNet50(add_intermediate_layer=add, intermediate_dim=dim)
     elif model == "vgg16":
-        return VGG16(add_intermediate_layer=add)
-    elif model == "efficient":
-        return EfficientNet(add_intermediate_layer=add)
+        return VGG16(add_intermediate_layer=add, intermediate_dim=dim)
+    elif model == "efficient_b0":
+        return EfficientNet_b0(add_intermediate_layer=add, intermediate_dim=dim)
+    elif model == "efficient_b4":
+        return EfficientNet_b4(add_intermediate_layer=add, intermediate_dim=dim)
     else:
-        raise ValueError("Model name should either be res50, vgg16, or efficient")
+        raise ValueError("Model name should either be res50, vgg16, efficient_b0, or efficient_b4")
 
 
 def load_model(path):
