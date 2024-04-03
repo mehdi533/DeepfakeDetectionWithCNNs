@@ -8,7 +8,7 @@ from networks.resnet import resnet50
 import torchvision.models as models
 import torch.nn as nn
 from networks.custom_models import *
-from deepfake_detector import Detector
+from deepfake_detector import Detector, return_model
 from data import create_dataloader
 #-----------–-----------–-----------–--------
 from options.test_options import TestOptions
@@ -27,8 +27,8 @@ def evaluation(model_path, name, opt):
     opt.models = ["real", "PNDM", "DDPM", "LDM", "ProGAN"]
     list_models = opt.models
     list_models.remove("real")
-
-    model = VGG16(num_classes=1)
+    
+    model = return_model(name.split('_')[0], ("inter#64" in name))
         
     state_dict = torch.load(model_path, map_location='cpu')
     model.load_state_dict(state_dict['model'])
@@ -95,5 +95,5 @@ def eval_multiple(path_list, opt):
 
 if __name__ == "__main__":
     opt = TestOptions().parse(print_options=False)
-    # evaluation(opt.model_path, opt.filename, opt)
-    eval_multiple(["checkpoints/vgg16_inter#64_DDPM/model_epoch_best.pth", "checkpoints/vgg16_inter#64_PNDM/model_epoch_best.pth", "checkpoints/res50_inter#64_DDPM/model_epoch_best.pth", "checkpoints/efficient_inter#64_PNDM/model_epoch_best.pth", "checkpoints/efficient_inter#64_DDPM/model_epoch_best.pth"], opt)
+    evaluation(opt.model_path, opt.filename, opt)
+    # eval_multiple(["checkpoints/vgg16_inter#64_DDPM/model_epoch_best.pth", "checkpoints/vgg16_inter#64_PNDM/model_epoch_best.pth", "checkpoints/res50_inter#64_DDPM/model_epoch_best.pth", "checkpoints/efficient_inter#64_PNDM/model_epoch_best.pth", "checkpoints/efficient_inter#64_DDPM/model_epoch_best.pth"], opt)

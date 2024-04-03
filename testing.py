@@ -18,7 +18,9 @@ if __name__ == "__main__":
         model_path = os.path.join(opt.model_path, dir, "model_epoch_best.pth")
         parts = dir.split('_')  # Split by underscore
         models = parts[-1]  # Get the last part
+        _type = str(parts[1:])
+        net = parts[0]
     
-        name = opt.name + '-' + models + '_bs' + str(opt.batch_size)
+        name = opt.name + '_' + net + '_' + _type + '_bs' + str(opt.batch_size)
 
         evaluation(model_path, name, opt)

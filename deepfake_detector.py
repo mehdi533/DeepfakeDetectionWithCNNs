@@ -5,6 +5,17 @@ from networks.custom_models import *
 from sklearn.metrics import average_precision_score, precision_recall_curve, accuracy_score, f1_score, roc_auc_score, precision_score, recall_score
 
 
+def return_model(model, add):
+    if model == "res50":
+        return ResNet50(add_intermediate_layer=add)
+    elif model == "vgg16":
+        return VGG16(add_intermediate_layer=add)
+    elif model == "efficient":
+        return EfficientNet(add_intermediate_layer=add)
+    else:
+        raise ValueError("Model name should either be res50, vgg16, or efficient")
+
+
 def load_model(path):
     truncs = path.split('_')
     model, _type, trained_on = truncs[0], truncs[1], truncs[2]
@@ -13,15 +24,8 @@ def load_model(path):
         add = True
     else:
         add = False
-
-    if model == "res50":
-        net = ResNet50(add_intermediate_layer=add)
-    elif model == "vgg16":
-        net = VGG16(add_intermediate_layer=add)
-    elif model == "efficient":
-        net = EfficientNet(add_intermediate_layer=add)
     
-    return net
+    return return_model(model, _type)
 
 
 def voting_prediction(list_of_predictions):

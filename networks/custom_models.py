@@ -2,14 +2,41 @@ import torch
 import torch.nn as nn
 import torchvision.models as models
 from torchvision.models.vgg import VGG16_Weights
-from torchvision.models.efficientnet import EfficientNet_B0_Weights
+from torchvision.models.efficientnet import EfficientNet_B0_Weights, EfficientNet_B4_Weights
 from torchvision.models.resnet import ResNet50_Weights
     
-class EfficientNet(nn.Module):
+class EfficientNet_b0(nn.Module):
     def __init__(self, num_classes=1, init_gain=0.02, intermediate_dim=64, add_intermediate_layer=True):
-        super(EfficientNet, self).__init__()
+        super(EfficientNet_b0, self).__init__()
     
         self.model = models.efficientnet_b0(weights=EfficientNet_B0_Weights.DEFAULT)
+
+        num_ftrs = self.model.classifier[1].in_features
+
+        if add_intermediate_layer:
+            self.intermediate_layer = nn.Linear(num_ftrs, intermediate_dim)
+            
+            self.model.classifier[1] = nn.Sequential(
+                self.intermediate_layer,
+                nn.ReLU(inplace=True),  # Add ReLU activation if needed
+                nn.Linear(intermediate_dim, num_classes)  # Output layer
+            )
+            
+            torch.nn.init.normal_(self.intermediate_layer.weight.data, 0.0, init_gain)
+            torch.nn.init.normal_(self.model.classifier[1][2].weight.data, 0.0, init_gain)
+        else:
+            self.model.classifier[1] = nn.Linear(num_ftrs, num_classes)
+            torch.nn.init.normal_(self.model.classifier[1].weight.data, 0.0, init_gain)
+
+    def forward(self, x):
+        return self.model(x)
+    
+
+class EfficientNet_b4(nn.Module):
+    def __init__(self, num_classes=1, init_gain=0.02, intermediate_dim=64, add_intermediate_layer=True):
+        super(EfficientNet_b4, self).__init__()
+    
+        self.model = models.efficientnet_b4(weights=EfficientNet_B4_Weights.DEFAULT)
 
         num_ftrs = self.model.classifier[1].in_features
 

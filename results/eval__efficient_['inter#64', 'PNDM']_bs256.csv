@@ -1,0 +1,6 @@
+"eval__efficient_['inter#64', 'PNDM']_bs256 model testing on..."
+testset,accuracy,avg precision,f1 score,roc score,recall,precision
+PNDM,1.0,1.0,1.0,1.0,1.0,1.0
+DDPM,1.0,1.0,1.0,1.0,1.0,1.0
+LDM,0.5005,0.6324130405671837,0.001998001998001998,0.596773,1.0,0.001
+ProGAN,0.5,0.622843088759269,0.0,0.634177,0.0,0.0

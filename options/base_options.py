@@ -48,6 +48,8 @@ class BaseOptions():
         parser.add_argument('--metadata', type=str, default='', help='directory with list of real/fake images')
         parser.add_argument('--models', default='real', help='models to take into account')
         parser.add_argument('--filename', default='', help='filename to save')
+        parser.add_argument('--intermediate', default=0, help='filename to save')
+        parser.add_argument('--intermediate_dim', type=int, default=64, help='filename to save')
         # -------------------------------------------------------------------------------------------
         self.initialized = True
         return parser

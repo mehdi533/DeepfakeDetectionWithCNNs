@@ -1,0 +1,6 @@
+eval_inter#64_efficient_compr-LDM_bs256 model testing on...
+testset,accuracy,avg precision,f1 score,roc score,recall,precision
+PNDM,0.7945,0.996368079572657,0.7413467589679044,0.9955470000000001,1.0,0.589
+DDPM,0.994,0.999996002991015,0.993963782696177,0.999996,1.0,0.988
+LDM,1.0,1.0,1.0,1.0,1.0,1.0
+ProGAN,0.5,0.5661109445300886,0.0,0.604981,0.0,0.0

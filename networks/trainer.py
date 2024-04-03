@@ -20,11 +20,15 @@ class Trainer(BaseModel):
         if self.isTrain and not opt.continue_train:
             # ------------------------------------------------------------------------
             if opt.arch == 'res50':
-                self.model = ResNet50()
-            if opt.arch == 'vgg16':
-                self.model = VGG16()
-            if opt.arch == 'efficient':
-                self.model = EfficientNet()
+                self.model = ResNet50(add_intermediate_layer = opt.intermediate, intermediate_dim=opt.intermediate_dim)
+            elif opt.arch == 'vgg16':
+                self.model = VGG16(add_intermediate_layer = opt.intermediate, intermediate_dim=opt.intermediate_dim)
+            elif opt.arch == 'efficient_b0':
+                self.model = EfficientNet_b0(add_intermediate_layer = opt.intermediate, intermediate_dim=opt.intermediate_dim)
+            elif opt.arch == 'efficient_b4':
+                self.model = EfficientNet_b4(add_intermediate_layer = opt.intermediate, intermediate_dim=opt.intermediate_dim)
+            else:
+                raise ValueError("Model name should either be res50, vgg16, efficient_b0, or efficient_b4")
             # self.model = EfficientNet(num_classes=2)
             # self.model = VGG16()
             # self.model = models.efficientnet_b0(pretrained=True)

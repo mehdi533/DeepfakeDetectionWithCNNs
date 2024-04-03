@@ -1,0 +1,6 @@
+eval_inter#64_efficient_blur-LDM_bs256 model testing on...
+testset,accuracy,avg precision,f1 score,roc score,recall,precision
+PNDM,0.5,0.80639221760007,0.0,0.778748,0.0,0.0
+DDPM,0.5,0.7468252500872113,0.0,0.717565,0.0,0.0
+LDM,1.0,1.0,1.0,1.0,1.0,1.0
+ProGAN,0.5,0.5238225218304486,0.0,0.5499890000000001,0.0,0.0

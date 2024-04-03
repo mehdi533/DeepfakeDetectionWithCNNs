@@ -1,0 +1,6 @@
+efficient_eval_inter#64__ model testing on...
+testset,accuracy,avg precision,f1 score,roc score,recall,precision
+PNDM,0.501,0.7220390007216005,0.003992015968063872,0.694183,1.0,0.002
+DDPM,0.5,0.5260868372011687,0.0,0.525185,0.0,0.0
+LDM,0.5005,0.5527092076895369,0.001998001998001998,0.527165,1.0,0.001
+ProGAN,1.0,1.0,1.0,1.0,1.0,1.0
