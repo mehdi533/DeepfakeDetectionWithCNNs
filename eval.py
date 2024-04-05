@@ -28,7 +28,7 @@ def evaluation(model_path, name, opt):
     list_models = opt.models
     list_models.remove("real")
     
-    model = return_model(opt.arch, 1, opt.intermediate_dim)
+    model = return_model(opt.arch, opt.intermediate, opt.intermediate_dim)
         
     state_dict = torch.load(model_path, map_location='cpu')
     model.load_state_dict(state_dict['model'])

@@ -1,0 +1,6 @@
+efficient_b4_eval_inter_16_LDM model testing on...
+testset,accuracy,avg precision,f1 score,roc score,recall,precision
+PNDM,0.557,0.9644357248912707,0.20466786355475763,0.9638960000000001,1.0,0.114
+DDPM,0.5,0.6798470171119109,0.0,0.71676,0.0,0.0
+LDM,1.0,1.0,1.0,1.0,1.0,1.0
+ProGAN,0.566,0.9789768869976634,0.2332155477031802,0.978854,1.0,0.132

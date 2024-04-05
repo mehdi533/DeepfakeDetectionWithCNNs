@@ -4,7 +4,60 @@ import torchvision.models as models
 from torchvision.models.vgg import VGG16_Weights
 from torchvision.models.efficientnet import EfficientNet_B0_Weights, EfficientNet_B4_Weights
 from torchvision.models.resnet import ResNet50_Weights
+from transformers import SwinForImageClassification
+from transformers import AutoModel , AutoConfig, AutoTokenizer
+
+class SwinTransformer(nn.Module):
+    def __init__(self, num_classes=1, init_gain=0.02, freeze_layers=True,  *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        super(SwinTransformer, self).__init__()
+        model_name = 'microsoft/swin-tiny-patch4-window7-224'
+        self.model = SwinForImageClassification.from_pretrained(model_name, num_labels=num_classes, ignore_mismatched_sizes=True)
+
+        if freeze_layers:
+            # Freeze all layers initially
+            for name, param in self.model.named_parameters():
+                # Freeze parameters by default
+                param.requires_grad = False
+
+                # Unfreeze parameters in the last stage (stage 3, in this case)
+                if 'encoder.layers.3' in name:
+                    param.requires_grad = True
+
+    def forward(self, x, *args, **kwargs):
+        outputs = super().__call__(x,  *args, **kwargs)
+        # Directly return the logits or any other specific output component
+        return outputs.logits  # Or return outputs if you want the full output object
     
+
+class HuggingModel(nn.Module):
+    def __init__(self, base_mod_name, NUM_CLASSES, freeze_layers=None):
+        super().__init__()
+        self.config = AutoConfig.from_pretrained(base_mod_name)
+        self.base_model = AutoModel.from_pretrained(base_mod_name, config=self.config)
+        
+        # Freeze layers if specified
+        if freeze_layers:
+            for name, param in self.base_model.named_parameters():
+                if any(layer in name for layer in freeze_layers):
+                    param.requires_grad = False
+
+        # Assuming the last hidden state has a shape of [batch, sequence_length, hidden_size]
+        # and you want to pool this to a shape of [batch, hidden_size]
+        self.pooler = torch.nn.AdaptiveAvgPool1d(1)
+        self.lin_layer = torch.nn.Linear(self.config.hidden_size, NUM_CLASSES)
+
+    def forward(self, inputs):
+        model_output = self.base_model(inputs)
+        features = model_output.last_hidden_state  # Assuming shape [batch, seq_len, hidden_size]
+        # Convert features from [batch, seq_len, hidden_size] to [batch, hidden_size, seq_len]
+        features = features.permute(0, 2, 1)
+        # Pool the features to shape [batch, hidden_size, 1] and remove the last dimension
+        pooled_features = self.pooler(features).squeeze(-1)
+        outs = self.lin_layer(pooled_features)
+        return outs
+    
+
 class EfficientNet_b0(nn.Module):
     def __init__(self, num_classes=1, init_gain=0.02, intermediate_dim=64, add_intermediate_layer=True):
         super(EfficientNet_b0, self).__init__()

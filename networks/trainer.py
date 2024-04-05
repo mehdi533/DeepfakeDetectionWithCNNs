@@ -27,6 +27,8 @@ class Trainer(BaseModel):
                 self.model = EfficientNet_b0(add_intermediate_layer = opt.intermediate, intermediate_dim=opt.intermediate_dim)
             elif opt.arch == 'efficient_b4':
                 self.model = EfficientNet_b4(add_intermediate_layer = opt.intermediate, intermediate_dim=opt.intermediate_dim)
+            elif opt.arch == 'swin':
+                self.model = HuggingModel("microsoft/swin-tiny-patch4-window7-224", 1, ["base_model.encoder.layers.3.blocks.1"])
             else:
                 raise ValueError("Model name should either be res50, vgg16, efficient_b0, or efficient_b4")
             # self.model = EfficientNet(num_classes=2)
