@@ -80,71 +80,71 @@ def blurring(img, opt):
 
 # -------------------------------------------------------------------------------------------
 
-def dataset_folder(opt, root):
-    if opt.mode == 'binary':
-        binary_dataset(opt, root)
-    if opt.mode == 'filename':
-        return FileNameDataset(opt, root)
-    raise ValueError('opt.mode needs to be binary or filename.')
+# def dataset_folder(opt, root):
+#     if opt.mode == 'binary':
+#         binary_dataset(opt, root)
+#     if opt.mode == 'filename':
+#         return FileNameDataset(opt, root)
+#     raise ValueError('opt.mode needs to be binary or filename.')
 
 
-def binary_dataset(opt, root):
-    if opt.isTrain:
-        crop_func = transforms.RandomCrop(opt.cropSize)
-    elif opt.no_crop:
-        crop_func = transforms.Lambda(lambda img: img)
-    else:
-        crop_func = transforms.CenterCrop(opt.cropSize)
+# def binary_dataset(opt, root):
+#     if opt.isTrain:
+#         crop_func = transforms.RandomCrop(opt.cropSize)
+#     elif opt.no_crop:
+#         crop_func = transforms.Lambda(lambda img: img)
+#     else:
+#         crop_func = transforms.CenterCrop(opt.cropSize)
 
-    if opt.isTrain and not opt.no_flip:
-        flip_func = transforms.RandomHorizontalFlip()
-    else:
-        flip_func = transforms.Lambda(lambda img: img)
-    if not opt.isTrain and opt.no_resize:
-        rz_func = transforms.Lambda(lambda img: img)
-    else:
-        rz_func = transforms.Lambda(lambda img: custom_resize(img, opt))
+#     if opt.isTrain and not opt.no_flip:
+#         flip_func = transforms.RandomHorizontalFlip()
+#     else:
+#         flip_func = transforms.Lambda(lambda img: img)
+#     if not opt.isTrain and opt.no_resize:
+#         rz_func = transforms.Lambda(lambda img: img)
+#     else:
+#         rz_func = transforms.Lambda(lambda img: custom_resize(img, opt))
 
-    dset = datasets.ImageFolder(
-            root,
-            transforms.Compose([
-                rz_func,
-                transforms.Lambda(lambda img: data_augment(img, opt)),
-                crop_func,
-                flip_func,
-                transforms.ToTensor(),
-                transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-            ]))
-    return dset
-
-
-class FileNameDataset(datasets.ImageFolder):
-    def name(self):
-        return 'FileNameDataset'
-
-    def __init__(self, opt, root):
-        self.opt = opt
-        super().__init__(root)
-
-    def __getitem__(self, index):
-        # Loading sample
-        path, target = self.samples[index]
-        return path
+#     dset = datasets.ImageFolder(
+#             root,
+#             transforms.Compose([
+#                 rz_func,
+#                 transforms.Lambda(lambda img: data_augment(img, opt)),
+#                 crop_func,
+#                 flip_func,
+#                 transforms.ToTensor(),
+#                 transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+#             ]))
+#     return dset
 
 
-def data_augment(img, opt):
-    img = np.array(img)
+# class FileNameDataset(datasets.ImageFolder):
+#     def name(self):
+#         return 'FileNameDataset'
 
-    if random() < opt.blur_prob:
-        sig = sample_continuous(opt.blur_sig)
-        gaussian_blur(img, sig)
+#     def __init__(self, opt, root):
+#         self.opt = opt
+#         super().__init__(root)
 
-    if random() < opt.jpg_prob:
-        method = sample_discrete(opt.jpg_method)
-        qual = sample_discrete(opt.jpg_qual)
-        img = jpeg_from_key(img, qual, method)
+#     def __getitem__(self, index):
+#         # Loading sample
+#         path, target = self.samples[index]
+#         return path
 
-    return Image.fromarray(img)
+
+# def data_augment(img, opt):
+#     img = np.array(img)
+
+#     if random() < opt.blur_prob:
+#         sig = sample_continuous(opt.blur_sig)
+#         gaussian_blur(img, sig)
+
+#     if random() < opt.jpg_prob:
+#         method = sample_discrete(opt.jpg_method)
+#         qual = sample_discrete(opt.jpg_qual)
+#         img = jpeg_from_key(img, qual, method)
+
+#     return Image.fromarray(img)
 
 
 def sample_continuous(s):
@@ -193,10 +193,10 @@ def jpeg_from_key(img, compress_val, key):
     return method(img, compress_val)
 
 
-rz_dict = {'bilinear': Image.BILINEAR,
-           'bicubic': Image.BICUBIC,
-           'lanczos': Image.LANCZOS,
-           'nearest': Image.NEAREST}
-def custom_resize(img, opt):
-    interp = sample_discrete(opt.rz_interp)
-    return TF.resize(img, opt.loadSize, interpolation=rz_dict[interp])
+# rz_dict = {'bilinear': Image.BILINEAR,
+#            'bicubic': Image.BICUBIC,
+#            'lanczos': Image.LANCZOS,
+#            'nearest': Image.NEAREST}
+# def custom_resize(img, opt):
+#     interp = sample_discrete(opt.rz_interp)
+#     return TF.resize(img, opt.loadSize, interpolation=rz_dict[interp])
