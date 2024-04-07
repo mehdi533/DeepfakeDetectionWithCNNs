@@ -21,7 +21,7 @@
                   gpu_ids: 0                             
                 init_gain: 0.02                          
                 init_type: normal                        
-             intermediate: False                         
+             intermediate: True                          	[default: False]
          intermediate_dim: 3                             	[default: 64]
                   isTrain: True                          	[default: None]
                jpg_method: cv2,pil                       	[default: cv2]
@@ -34,7 +34,7 @@
                  metadata: ./dataset/Metadata/           	[default: ]
                      mode: binary                        
                    models: real,LDM                      	[default: real]
-                     name: normal                        	[default: experiment_name]
+                     name: additional_layer              	[default: experiment_name]
                 new_optim: False                         
                     niter: 10000                         
                   no_flip: False                         
@@ -48,5 +48,5 @@
                    suffix:                               
               train_split: train                         
                 val_split: val                           
-time is: 2024-04-07 06:18:27.939263
+time is: 2024-04-07 06:14:25.969244
 ----------------- End -------------------

@@ -34,7 +34,7 @@
                  metadata: ./dataset/Metadata/           	[default: ]
                      mode: binary                        
                    models: real,LDM                      	[default: real]
-                     name: normal                        	[default: experiment_name]
+                     name: freeze                        	[default: experiment_name]
                 new_optim: False                         
                     niter: 10000                         
                   no_flip: False                         
@@ -48,5 +48,5 @@
                    suffix:                               
               train_split: train                         
                 val_split: val                           
-time is: 2024-04-07 06:18:27.939263
+time is: 2024-04-05 12:10:35.790743
 ----------------- End -------------------

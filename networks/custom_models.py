@@ -31,7 +31,7 @@ class SwinTransformer(nn.Module):
     
 
 class HuggingModel(nn.Module):
-    def __init__(self, base_mod_name, NUM_CLASSES, freeze_layers=None):
+    def __init__(self, base_mod_name, NUM_CLASSES, freeze_layers=None, additional_layers=False):
         super().__init__()
         self.config = AutoConfig.from_pretrained(base_mod_name)
         self.base_model = AutoModel.from_pretrained(base_mod_name, config=self.config)
@@ -41,6 +41,17 @@ class HuggingModel(nn.Module):
             for name, param in self.base_model.named_parameters():
                 if any(layer in name for layer in freeze_layers):
                     param.requires_grad = False
+        
+        if additional_layers:
+            # Add one or two linear layers for classification
+            self.classifier = nn.Sequential(
+                nn.Linear(self.config.hidden_size, self.config.hidden_size),
+                nn.ReLU(),
+                nn.Linear(self.config.hidden_size, NUM_CLASSES)
+            )
+        else:
+            # Directly connect to a single linear layer for classification
+            self.classifier = nn.Linear(self.config.hidden_size, NUM_CLASSES)
 
         # Assuming the last hidden state has a shape of [batch, sequence_length, hidden_size]
         # and you want to pool this to a shape of [batch, hidden_size]

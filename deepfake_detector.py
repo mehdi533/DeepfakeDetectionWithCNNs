@@ -14,6 +14,8 @@ def return_model(model, add, dim):
         return EfficientNet_b0(add_intermediate_layer=add, intermediate_dim=dim)
     elif model == "efficient_b4":
         return EfficientNet_b4(add_intermediate_layer=add, intermediate_dim=dim)
+    elif model == "swin":
+        return HuggingModel("microsoft/swin-tiny-patch4-window7-224", 1, additional_layers=add)
     else:
         raise ValueError("Model name should either be res50, vgg16, efficient_b0, or efficient_b4")
 
