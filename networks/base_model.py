@@ -12,8 +12,8 @@ class BaseModel(nn.Module):
         self.opt = opt
         self.total_steps = 0
         self.isTrain = opt.isTrain
-        mod = "-".join(map(str, opt.models[1:]))
-        self.save_dir = os.path.join(opt.checkpoints_dir,opt.filename)
+        # mod = "-".join(map(str, opt.models[1:]))
+        self.save_dir = os.path.join(opt.checkpoints_dir, opt.filename)
         self.device = torch.device('cuda:{}'.format(opt.gpu_ids[0])) if opt.gpu_ids else torch.device('cpu')
 
     def save_networks(self, epoch):
@@ -30,6 +30,7 @@ class BaseModel(nn.Module):
         torch.save(state_dict, save_path)
 
     # load models from the disk
+    # Used for validation model
     def load_networks(self, epoch):
         load_filename = 'model_epoch_%s.pth' % epoch
         load_path = os.path.join(self.save_dir, load_filename)
@@ -38,8 +39,9 @@ class BaseModel(nn.Module):
         # if you are using PyTorch newer than 0.4 (e.g., built from
         # GitHub source), you can remove str() on self.device
         state_dict = torch.load(load_path, map_location=self.device)
-        if hasattr(state_dict, '_metadata'):
-            del state_dict._metadata
+
+        # if hasattr(state_dict, '_metadata'):
+        #     del state_dict._metadata
 
         self.model.load_state_dict(state_dict['model'])
         self.total_steps = state_dict['total_steps']
@@ -63,25 +65,25 @@ class BaseModel(nn.Module):
             self.forward()
 
 
-def init_weights(net, init_type='normal', gain=0.02):
-    def init_func(m):
-        classname = m.__class__.__name__
-        if hasattr(m, 'weight') and (classname.find('Conv') != -1 or classname.find('Linear') != -1):
-            if init_type == 'normal':
-                init.normal_(m.weight.data, 0.0, gain)
-            elif init_type == 'xavier':
-                init.xavier_normal_(m.weight.data, gain=gain)
-            elif init_type == 'kaiming':
-                init.kaiming_normal_(m.weight.data, a=0, mode='fan_in')
-            elif init_type == 'orthogonal':
-                init.orthogonal_(m.weight.data, gain=gain)
-            else:
-                raise NotImplementedError('initialization method [%s] is not implemented' % init_type)
-            if hasattr(m, 'bias') and m.bias is not None:
-                init.constant_(m.bias.data, 0.0)
-        elif classname.find('BatchNorm2d') != -1:
-            init.normal_(m.weight.data, 1.0, gain)
-            init.constant_(m.bias.data, 0.0)
+# def init_weights(net, init_type='normal', gain=0.02):
+#     def init_func(m):
+#         classname = m.__class__.__name__
+#         if hasattr(m, 'weight') and (classname.find('Conv') != -1 or classname.find('Linear') != -1):
+#             if init_type == 'normal':
+#                 init.normal_(m.weight.data, 0.0, gain)
+#             elif init_type == 'xavier':
+#                 init.xavier_normal_(m.weight.data, gain=gain)
+#             elif init_type == 'kaiming':
+#                 init.kaiming_normal_(m.weight.data, a=0, mode='fan_in')
+#             elif init_type == 'orthogonal':
+#                 init.orthogonal_(m.weight.data, gain=gain)
+#             else:
+#                 raise NotImplementedError('initialization method [%s] is not implemented' % init_type)
+#             if hasattr(m, 'bias') and m.bias is not None:
+#                 init.constant_(m.bias.data, 0.0)
+#         elif classname.find('BatchNorm2d') != -1:
+#             init.normal_(m.weight.data, 1.0, gain)
+#             init.constant_(m.bias.data, 0.0)
 
-    print('initialize network with %s' % init_type)
-    net.apply(init_func)
+#     print('initialize network with %s' % init_type)
+#     net.apply(init_func)

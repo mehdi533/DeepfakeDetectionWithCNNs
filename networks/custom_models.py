@@ -4,30 +4,7 @@ import torchvision.models as models
 from torchvision.models.vgg import VGG16_Weights
 from torchvision.models.efficientnet import EfficientNet_B0_Weights, EfficientNet_B4_Weights
 from torchvision.models.resnet import ResNet50_Weights
-from transformers import SwinForImageClassification
-from transformers import AutoModel , AutoConfig, AutoTokenizer
-
-class SwinTransformer(nn.Module):
-    def __init__(self, num_classes=1, init_gain=0.02, freeze_layers=True,  *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        super(SwinTransformer, self).__init__()
-        model_name = 'microsoft/swin-tiny-patch4-window7-224'
-        self.model = SwinForImageClassification.from_pretrained(model_name, num_labels=num_classes, ignore_mismatched_sizes=True)
-
-        if freeze_layers:
-            # Freeze all layers initially
-            for name, param in self.model.named_parameters():
-                # Freeze parameters by default
-                param.requires_grad = False
-
-                # Unfreeze parameters in the last stage (stage 3, in this case)
-                if 'encoder.layers.3' in name:
-                    param.requires_grad = True
-
-    def forward(self, x, *args, **kwargs):
-        outputs = super().__call__(x,  *args, **kwargs)
-        # Directly return the logits or any other specific output component
-        return outputs.logits  # Or return outputs if you want the full output object
+from transformers import AutoModel , AutoConfig
     
 
 class HuggingModel(nn.Module):

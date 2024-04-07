@@ -4,13 +4,13 @@ from torch.utils.data.sampler import WeightedRandomSampler
 
 from .datasets import dataset_folder, get_dataset_metadata
 
-def get_dataset(opt):
-    dset_lst = []
-    for cls in opt.classes:
-        root = opt.dataroot + '/' + cls
-        dset = dataset_folder(opt, root)
-        dset_lst.append(dset)
-    return torch.utils.data.ConcatDataset(dset_lst)
+# def get_dataset(opt):
+#     dset_lst = []
+#     for cls in opt.classes:
+#         root = opt.dataroot + '/' + cls
+#         dset = dataset_folder(opt, root)
+#         dset_lst.append(dset)
+#     return torch.utils.data.ConcatDataset(dset_lst)
 
 
 # -------------------------------------------------------------------------------------------
@@ -64,12 +64,17 @@ def get_bal_sampler(dataset):
     return sampler
 
 
-def create_dataloader(opt, __type):
+def create_dataloader(opt, _type):
     shuffle = not opt.serial_batches if (opt.isTrain and not opt.class_bal) else False
-    # -------------------------------------------------------------------------------------------
-    dataset = get_dataset(opt) if not opt.metadata else get_dataset_from_txt(opt, __type)
-    # -------------------------------------------------------------------------------------------
+
+    print(shuffle)
+    
+    # dataset = get_dataset(opt) if not opt.metadata else get_dataset_from_txt(opt, __type)
+
+    dataset = get_dataset_from_txt(opt, _type)
     sampler = get_bal_sampler(dataset) if opt.class_bal else None
+
+    print(sampler)
     data_loader = torch.utils.data.DataLoader(dataset,
                                               batch_size=opt.batch_size,
                                               shuffle=shuffle,

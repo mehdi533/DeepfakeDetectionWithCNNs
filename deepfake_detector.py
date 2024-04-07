@@ -5,7 +5,7 @@ from networks.custom_models import *
 from sklearn.metrics import average_precision_score, precision_recall_curve, accuracy_score, f1_score, roc_auc_score, precision_score, recall_score
 
 
-def return_model(model, add, dim):
+def return_model(model, add=False, dim=64, ):
     if model == "res50":
         return ResNet50(add_intermediate_layer=add, intermediate_dim=dim)
     elif model == "vgg16":
@@ -17,7 +17,7 @@ def return_model(model, add, dim):
     elif model == "swin":
         return HuggingModel("microsoft/swin-tiny-patch4-window7-224", 1, additional_layers=add)
     else:
-        raise ValueError("Model name should either be res50, vgg16, efficient_b0, or efficient_b4")
+        raise ValueError("Model name should either be res50, vgg16, efficient_b0, efficient_b4, or swin")
 
 
 def load_model(path):

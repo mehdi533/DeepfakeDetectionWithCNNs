@@ -13,7 +13,7 @@ dataroot = './dataset/test/'
 #         'crn', 'imle', 'seeingdark', 'san', 'deepfake', 'stylegan2', 'whichfaceisreal']
 
 # indicates if corresponding testset has multiple classes
-multiclass = [1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0]
+# multiclass = [1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0]
 
 # model
 # model_path = 'weights/blur_jpg_prob0.5.pth'

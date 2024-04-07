@@ -22,8 +22,7 @@ def evaluation(model_path, name, opt):
             ['testset', 'accuracy', 'avg precision', "f1 score", "roc score", "recall", "precision"]]
 
     print("{} model testing on...".format(name))
-
-    # ---------------------------------------------------------------------
+    
     opt.models = ["real", "PNDM", "DDPM", "LDM", "ProGAN"]
     list_models = opt.models
     list_models.remove("real")
@@ -36,20 +35,8 @@ def evaluation(model_path, name, opt):
     model.eval()
     
     for v_id, test_model in enumerate(list_models):
-            
-        #opt.dataroot = '{}/{}'.format(dataroot, val)
-        #opt.classes = os.listdir(opt.dataroot) if multiclass[v_id] else ['']
-        #opt.classes = [0, 1]
-        # ---------------------------------------------------------------------
         opt.no_resize = True    # testing without resizing by default
         opt.models = [test_model, "real"]
-        # model = resnet50(num_classes=1)
-        # model = models.efficientnet_b0(num_classes=1)
-        # num_ftrs = model.classifier[1].in_features
-        # model.classifier[1] = nn.Linear(num_ftrs, 1)
-        # model.fc = nn.Linear(2048, 1)
-        # model = models.vgg16(num_classes=1)
-        # ---------------------------------------------------------------------
         acc, ap, r_acc, f_acc, f1, auc, prec, recall, _, _ = validate(model, opt, "test_list")
         rows.append([test_model, acc, ap, f1, auc, prec, recall])
         print("({}) acc: {}; ap: {}; r_acc: {}; f_acc: {} f1: {}; roc_auc: {}; recall: {}; precision: {}".format(test_model, acc, ap, r_acc, f_acc, f1, auc, recall, prec))
