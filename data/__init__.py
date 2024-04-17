@@ -2,7 +2,7 @@ import torch
 import numpy as np
 from torch.utils.data.sampler import WeightedRandomSampler
 
-from .datasets import dataset_folder, get_dataset_metadata
+from .datasets import get_dataset_metadata #, dataset_folder
 
 # def get_dataset(opt):
 #     dset_lst = []
@@ -65,9 +65,9 @@ def get_bal_sampler(dataset):
 
 
 def create_dataloader(opt, _type):
-    shuffle = not opt.serial_batches if (opt.isTrain and not opt.class_bal) else False
+    # shuffle = not opt.serial_batches if (opt.isTrain and not opt.class_bal) else False
 
-    print(shuffle)
+    # print(shuffle)
     
     # dataset = get_dataset(opt) if not opt.metadata else get_dataset_from_txt(opt, __type)
 
@@ -77,7 +77,7 @@ def create_dataloader(opt, _type):
     print(sampler)
     data_loader = torch.utils.data.DataLoader(dataset,
                                               batch_size=opt.batch_size,
-                                              shuffle=shuffle,
+                                            #   shuffle=shuffle,
                                               sampler=sampler,
                                               num_workers=int(opt.num_threads))
     return data_loader

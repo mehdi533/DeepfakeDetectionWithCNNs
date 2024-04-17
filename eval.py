@@ -3,7 +3,7 @@ import csv
 import torch
 
 from validate import validate
-from networks.resnet import resnet50
+# from networks.resnet import resnet50
 #-----------–-----------–-----------–--------
 import torchvision.models as models
 import torch.nn as nn
@@ -18,16 +18,16 @@ from eval_config import *
 def evaluation(model_path, name, opt):
     # Running tests
     model_name = os.path.basename(model_path).replace('.pth', '')
-    rows = [["{} model testing on...".format(name)],
+    rows = [["{} model testing on...".format(model_name)],
             ['testset', 'accuracy', 'avg precision', "f1 score", "roc score", "recall", "precision"]]
 
-    print("{} model testing on...".format(name))
+    print("{} model testing on...".format(model_name))
     
     opt.models = ["real", "PNDM", "DDPM", "LDM", "ProGAN"]
     list_models = opt.models
     list_models.remove("real")
     
-    model = return_model(opt.arch, opt.intermediate, opt.intermediate_dim)
+    model = return_model(opt.arch, add=opt.intermediate, dim=opt.intermediate_dim)
         
     state_dict = torch.load(model_path, map_location='cpu')
     model.load_state_dict(state_dict['model'])

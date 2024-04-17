@@ -1,9 +1,10 @@
 import torch
 import numpy as np
-from networks.resnet import resnet50
+# from networks.resnet import resnet50
 from sklearn.metrics import average_precision_score, precision_recall_curve, accuracy_score, f1_score, roc_auc_score, precision_score, recall_score
 from options.test_options import TestOptions
 from data import create_dataloader
+from deepfake_detector import return_model
 
 
 def validate(model, opt, __type):
@@ -40,7 +41,7 @@ def validate(model, opt, __type):
 if __name__ == '__main__':
     opt = TestOptions().parse(print_options=False)
 
-    model = resnet50(num_classes=1)
+    model = return_model(opt.arch, add=opt.intermediate, dim=opt.intermediate_dim)
     state_dict = torch.load(opt.model_path, map_location='cpu')
     model.load_state_dict(state_dict['model'])
 

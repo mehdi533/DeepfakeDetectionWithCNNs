@@ -8,7 +8,7 @@ from transformers import AutoModel , AutoConfig
     
 
 class HuggingModel(nn.Module):
-    def __init__(self, base_mod_name, NUM_CLASSES, freeze_layers=None, additional_layers=False):
+    def __init__(self, base_mod_name, NUM_CLASSES=1, freeze_layers=None, additional_layers=False):
         super().__init__()
         self.config = AutoConfig.from_pretrained(base_mod_name)
         self.base_model = AutoModel.from_pretrained(base_mod_name, config=self.config)
@@ -20,6 +20,7 @@ class HuggingModel(nn.Module):
                     param.requires_grad = False
         
         if additional_layers:
+            print('Additional')
             # Add one or two linear layers for classification
             self.classifier = nn.Sequential(
                 nn.Linear(self.config.hidden_size, self.config.hidden_size),
