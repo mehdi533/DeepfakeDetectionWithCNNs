@@ -27,6 +27,7 @@ class Trainer(BaseModel):
         if self.isTrain:
             self.loss_fn = nn.BCEWithLogitsLoss()
             # initialize optimizers
+            opt.optim = 'adam'
             if opt.optim == 'adam':
                 self.optimizer = torch.optim.Adam(self.model.parameters(),
                                                   lr=opt.lr, betas=(opt.beta1, 0.999))

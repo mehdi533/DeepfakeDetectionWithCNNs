@@ -72,12 +72,12 @@ def create_dataloader(opt, _type):
     # dataset = get_dataset(opt) if not opt.metadata else get_dataset_from_txt(opt, __type)
 
     dataset = get_dataset_from_txt(opt, _type)
-    sampler = get_bal_sampler(dataset) if opt.class_bal else None
+    # sampler = get_bal_sampler(dataset) if opt.class_bal else None
 
-    print(sampler)
+    # print(sampler)
     data_loader = torch.utils.data.DataLoader(dataset,
                                               batch_size=opt.batch_size,
                                             #   shuffle=shuffle,
-                                              sampler=sampler,
+                                            #   sampler=sampler,
                                               num_workers=int(opt.num_threads))
     return data_loader
