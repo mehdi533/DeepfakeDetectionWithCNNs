@@ -27,15 +27,15 @@ class Trainer(BaseModel):
         if self.isTrain:
             self.loss_fn = nn.BCEWithLogitsLoss()
             # initialize optimizers
-            opt.optim = 'adam'
-            if opt.optim == 'adam':
-                self.optimizer = torch.optim.Adam(self.model.parameters(),
+            # opt.optim = 'adam'
+            # if opt.optim == 'adam':
+            self.optimizer = torch.optim.Adam(self.model.parameters(),
                                                   lr=opt.lr, betas=(opt.beta1, 0.999))
-            elif opt.optim == 'sgd':
-                self.optimizer = torch.optim.SGD(self.model.parameters(),
-                                                 lr=opt.lr, momentum=0.0, weight_decay=0)
-            else:
-                raise ValueError("optim should be [adam, sgd]")
+            # elif opt.optim == 'sgd':
+            #     self.optimizer = torch.optim.SGD(self.model.parameters(),
+            #                                      lr=opt.lr, momentum=0.0, weight_decay=0)
+            # else:
+            #     raise ValueError("optim should be [adam, sgd]")
 
         if not self.isTrain or opt.continue_train:
             self.load_networks(opt.epoch)
