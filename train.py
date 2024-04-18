@@ -55,7 +55,7 @@ if __name__ == '__main__':
     # Initializes model instance for training
     model = Trainer(opt)
     # Early stop implementation
-    early_stopping = EarlyStopping(patience=opt.earlystop_epoch, verbose=True, delta=0.001)
+    early_stopping = EarlyStopping(patience=opt.earlystop_epoch, verbose=True, delta=-0.001)
 
     for epoch in range(opt.nepoch):
 
@@ -108,8 +108,8 @@ if __name__ == '__main__':
 
         print("Validation at epoch {} | accuracy: {}; average precision: {}".format(epoch, acc, ap))
 
-        # Early stopping based on the average precision achieved
-        early_stopping(ap, model)
+        # Early stopping based on the accuracy
+        early_stopping(acc, model)
 
         if early_stopping.early_stop:
             continue_training = model.adjust_learning_rate()
@@ -117,7 +117,7 @@ if __name__ == '__main__':
             # continue_training is True when learning rate doesn't fall under a threshold value
             if continue_training:
                 print("Learning rate dropped by 10, training continues...")
-                early_stopping = EarlyStopping(patience=opt.earlystop_epoch, delta=0.002, verbose=True)
+                early_stopping = EarlyStopping(patience=opt.earlystop_epoch, delta=-0.002, verbose=True)
             else:
                 print("Early stopping.")
                 break

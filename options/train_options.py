@@ -7,7 +7,7 @@ class TrainOptions(BaseOptions):
 
         parser.add_argument('--nepoch', type=int, default=10000, help='Number of epochs at starting learning rate')
         parser.add_argument('--earlystop_epoch', type=int, default=5, help='')
-        parser.add_argument('--loss_freq', type=int, default=50, help='frequency of showing loss on tensorboard')
+        parser.add_argument('--loss_freq', type=int, default=400, help='frequency of showing loss on tensorboard')
 
 
         parser.add_argument('--data_aug', action='store_true', help='if specified, perform additional data augmentation (photometric, blurring, jpegging)')

@@ -23,7 +23,7 @@ def evaluation(model_path, name, opt):
 
     print("{} model testing on...".format(model_name))
     
-    opt.models = ["real", "PNDM", "DDPM", "LDM", "ProGAN"]
+    opt.models = ["real", "PNDM", "DDPM", "LDM", "ProGAN", "DDIM", "StyleGAN_test", "VQGAN_test"]
     list_models = opt.models
     list_models.remove("real")
     
