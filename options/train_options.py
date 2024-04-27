@@ -8,7 +8,7 @@ class TrainOptions(BaseOptions):
         parser.add_argument('--data_aug', action='store_true', help='if specified, perform additional data augmentation (photometric, blurring, jpegging)')
         parser.add_argument('--optim', type=str, default='adam', help='optim to use [sgd, adam]')
         parser.add_argument('--new_optim', action='store_true', help='new optimizer instead of loading the optim state')
-        parser.add_argument('--loss_freq', type=int, default=400, help='frequency of showing loss on tensorboard')
+        parser.add_argument('--loss_freq', type=int, default=100, help='frequency of showing loss on tensorboard')
         parser.add_argument('--save_latest_freq', type=int, default=2000, help='frequency of saving the latest results')
         parser.add_argument('--save_epoch_freq', type=int, default=20, help='frequency of saving checkpoints at the end of epochs')
         parser.add_argument('--continue_train', action='store_true', help='continue training: load the latest model')

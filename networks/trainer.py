@@ -1,12 +1,13 @@
 import functools
 import torch
 import torch.nn as nn
-from networks.resnet import resnet50
+# from networks.resnet import resnet50
 from networks.base_model import BaseModel, init_weights
 # --------------------------------------------------------
 import torchvision.models as models
 from torchvision.models import VGG16_Weights
 from networks.custom_models import *
+import timm
 # --------------------------------------------------------
 
 
@@ -29,6 +30,16 @@ class Trainer(BaseModel):
                 self.model = EfficientNet_b4(add_intermediate_layer = opt.intermediate, intermediate_dim=opt.intermediate_dim)
             elif opt.arch == 'swin':
                 self.model = HuggingModel("microsoft/swin-tiny-patch4-window7-224", 1, ["base_model.encoder.layers.3.blocks.1"])
+            elif opt.arch == "resnext":
+        
+                self.model = timm.create_model('resnext101_32x8d', pretrained=True)
+
+                # Assuming the last layer was named 'head' and you verified it has an attribute 'in_features'
+                self.model.fc = nn.Sequential(
+                    nn.Linear(self.model.fc.in_features, self.model.fc.in_features),
+                    nn.ReLU(),
+                    nn.Linear(self.model.fc.in_features, 1)
+                )
             else:
                 raise ValueError("Model name should either be res50, vgg16, efficient_b0, or efficient_b4")
             # self.model = EfficientNet(num_classes=2)
@@ -48,8 +59,8 @@ class Trainer(BaseModel):
             # self.model=ResNet50()
             #-------------------------------------------------------------------------
 
-        if not self.isTrain or opt.continue_train:
-            self.model = resnet50(num_classes=1)
+        # if not self.isTrain or opt.continue_train:
+        #     self.model = resnet50(num_classes=1)
 
         if self.isTrain:
             self.loss_fn = nn.BCEWithLogitsLoss()

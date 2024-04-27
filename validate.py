@@ -1,6 +1,5 @@
 import torch
 import numpy as np
-from networks.resnet import resnet50
 from sklearn.metrics import average_precision_score, precision_recall_curve, accuracy_score, f1_score, roc_auc_score, precision_score, recall_score
 from options.test_options import TestOptions
 from data import create_dataloader
@@ -37,22 +36,22 @@ def validate(model, opt, __type):
     return acc, ap, r_acc, f_acc, f1score, auc_score, prec, recall, y_true, y_pred
 
 
-if __name__ == '__main__':
-    opt = TestOptions().parse(print_options=False)
+# if __name__ == '__main__':
+#     opt = TestOptions().parse(print_options=False)
 
-    model = resnet50(num_classes=1)
-    state_dict = torch.load(opt.model_path, map_location='cpu')
-    model.load_state_dict(state_dict['model'])
+#     model = resnet50(num_classes=1)
+#     state_dict = torch.load(opt.model_path, map_location='cpu')
+#     model.load_state_dict(state_dict['model'])
 
-    try:
-        model.cuda()
-    finally:
-        model.eval()
+#     try:
+#         model.cuda()
+#     finally:
+#         model.eval()
 
-    acc, avg_precision, r_acc, f_acc, y_true, y_pred = validate(model, opt)
+#     acc, avg_precision, r_acc, f_acc, y_true, y_pred = validate(model, opt)
 
-    print("accuracy:", acc)
-    print("average precision:", avg_precision)
+#     print("accuracy:", acc)
+#     print("average precision:", avg_precision)
 
-    print("accuracy of real images:", r_acc)
-    print("accuracy of fake images:", f_acc)
+#     print("accuracy of real images:", r_acc)
+#     print("accuracy of fake images:", f_acc)
