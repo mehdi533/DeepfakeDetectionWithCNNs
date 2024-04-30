@@ -23,9 +23,7 @@ def evaluation(model_path, name, opt):
     print("{} model testing on...".format(name))
 
     # ---------------------------------------------------------------------
-    opt.models = ["StyleGAN", "VQGAN", "real", "PNDM", "DDPM", "LDM", "DDIM", "ProGAN"]
-    list_models = opt.models
-    list_models.remove("real")
+    list_models = ["StyleGAN", "VQGAN", "PNDM", "DDPM", "LDM", "DDIM", "ProGAN"]
     
     model = return_model(opt.arch, opt.intermediate, opt.intermediate_dim)
         
@@ -37,7 +35,7 @@ def evaluation(model_path, name, opt):
     for v_id, test_model in enumerate(list_models):
             
         opt.no_resize = True    
-        opt.models = [test_model, "real"]
+        opt.models = [test_model]
         acc, ap, r_acc, f_acc, f1, auc, prec, recall, _, _ = validate(model, opt, "test_list")
         rows.append([test_model, acc, ap, f1, auc, prec, recall])
         print("({}) acc: {}; ap: {}; r_acc: {}; f_acc: {} f1: {}; roc_auc: {}; recall: {}; precision: {}".format(test_model, acc, ap, r_acc, f_acc, f1, auc, recall, prec))

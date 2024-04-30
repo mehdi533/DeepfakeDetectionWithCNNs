@@ -14,7 +14,7 @@ def return_model(model, add, dim):
     elif model == "efficient_b0":
         return EfficientNet_b0(add_intermediate_layer=add, intermediate_dim=dim)
     elif model == "efficient_b4":
-        return EfficientNet_b4(add_intermediate_layer=add, intermediate_dim=dim)
+        return EfficientNet_b4(add_intermediate_layer=True, intermediate_dim=dim)
 
     elif model == 'swin_tiny':
         return HuggingModel("microsoft/swin-tiny-patch4-window7-224", 1) #["base_model.encoder.layers.3.blocks.1"]

@@ -29,4 +29,7 @@ if __name__ == "__main__":
         
         opt.arch = model_arch(dir)
 
+        if opt.arch not in ["efficient_b4", "coatnet", "swin_tiny"]:
+            continue
+
         evaluation(model_path, dir, opt)
