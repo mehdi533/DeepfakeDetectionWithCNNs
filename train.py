@@ -54,15 +54,20 @@ if __name__ == '__main__':
 
     model = Trainer(opt)
     early_stopping = EarlyStopping(patience=opt.earlystop_epoch, delta=-0.001, verbose=True)
+    
     for epoch in range(opt.niter):
+
         print(f"epoch number: {epoch}")
+
         epoch_start_time = time.time()
         iter_data_time = time.time()
         epoch_iter = 0
 
         for i, data in enumerate(data_loader):
+
             model.total_steps += 1
             epoch_iter += opt.batch_size
+
             model.set_input(data)
             model.optimize_parameters()
 
@@ -82,7 +87,7 @@ if __name__ == '__main__':
             print('saving the model at the end of epoch %d, iters %d' %
                   (epoch, model.total_steps))
             model.save_networks('latest')
-            model.save_networks(epoch)
+            # model.save_networks(epoch)
 
         # Validation
         model.eval()
@@ -113,12 +118,27 @@ if __name__ == '__main__':
         # Early stopping based on the average precision achieved
         early_stopping(ap, model)
 
+        # if early_stopping.early_stop:
+        #     cont_train = model.adjust_learning_rate()
+        #     if cont_train:
+        #         print("Learning rate dropped by 10, continue training...")
+        #         early_stopping = EarlyStopping(patience=opt.earlystop_epoch, delta=-0.002, verbose=True)
+        #     else:
+        #         print("Early stopping.")
+        #         break
+        # model.train()
+
+
         if early_stopping.early_stop:
-            cont_train = model.adjust_learning_rate()
-            if cont_train:
-                print("Learning rate dropped by 10, continue training...")
+            continue_training = model.adjust_learning_rate()
+
+            # continue_training is True when learning rate doesn't fall under a threshold value
+            if continue_training:
+                print("Learning rate dropped by 10, training continues...")
                 early_stopping = EarlyStopping(patience=opt.earlystop_epoch, delta=-0.002, verbose=True)
             else:
                 print("Early stopping.")
                 break
+        
+        # Restarts another epoch
         model.train()

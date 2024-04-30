@@ -46,7 +46,6 @@ def get_images_list(opt, __type):
                     if model in opt.models:
                         images_list.append((cls.split("_")[0], os.path.join(opt.dataroot, model, line.strip())))
                         # e.g. (0, dataset/DDIM/00000.jpg)
-
     return images_list
 
 # -------------------------------------------------------------------------------------------

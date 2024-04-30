@@ -1,6 +1,7 @@
 import os
 import torch
 
+models_names = ["efficient_b0", "efficient_b4", "vgg16", "res50", "resnext", "coatnet", "swin_large", "swin_base", "swin_tiny"]
 
 def mkdirs(paths):
     if isinstance(paths, list) and not isinstance(paths, str):

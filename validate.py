@@ -13,10 +13,11 @@ def validate(model, opt, __type):
         y_true, y_pred = [], []
         for img, label in data_loader:
             # --------------------------------------------------------------------------------
-            try:
-                in_tens = img.cuda()
-            except AssertionError:
-                in_tens = img
+            # try:
+            #     in_tens = img.cuda()
+            # except AssertionError:
+            #     in_tens = img
+            in_tens = img.cuda()
             # --------------------------------------------------------------------------------
             y_pred.extend(model(in_tens).sigmoid().flatten().tolist())
             y_true.extend(label.flatten().tolist())
