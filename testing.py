@@ -17,6 +17,7 @@ if __name__ == "__main__":
     # python testing.py --name eval_resnet50 --batch_size 256 --model_path /home/abdallah/code/checkpoints/resnet50
     
     for dir in os.listdir(opt.folder_path):
+        
         """ 
         resnet50_name_GAN1-GAN2 
         efficient_b0_name_GAN1-GAN2
@@ -28,8 +29,5 @@ if __name__ == "__main__":
         # res50, vgg16, resnext, swin_tiny, swin_base, swin_large, coatnet, efficient_b0, efficient_b4
         
         opt.arch = model_arch(dir)
-
-        if opt.arch not in ["efficient_b4", "coatnet", "swin_tiny"]:
-            continue
 
         evaluation(model_path, dir, opt)

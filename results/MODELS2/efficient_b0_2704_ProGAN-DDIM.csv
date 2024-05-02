@@ -1,0 +1,9 @@
+efficient_b0_2704_ProGAN-DDIM model testing on...
+testset,accuracy,avg precision,f1 score,roc score,precision,recall
+StyleGAN,0.5,0.6854433372510814,0.0,0.721136,0.0,0.0
+VQGAN,1.0,1.0,1.0,1.0,1.0,1.0
+PNDM,0.992,0.9999772088807066,0.9919354838709677,0.999977,1.0,0.984
+DDPM,1.0,1.0,1.0,1.0,1.0,1.0
+LDM,0.5,0.5465850363311877,0.0,0.538718,0.0,0.0
+DDIM,1.0,1.0,1.0,1.0,1.0,1.0
+ProGAN,1.0,1.0,1.0,1.0,1.0,1.0

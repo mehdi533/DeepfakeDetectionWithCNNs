@@ -22,20 +22,22 @@ import os
 
 pd.DataFrame(columns=["Accuracy", "AUC", "Avg. precision", "Precision"])
 
-dir = "results/MODELS/"
+dir = "results/MODELS2/"
 
 test = ["StyleGAN", "VQGAN", "PNDM", "DDPM", "LDM", "DDIM", "ProGAN"]
 
 text = dict.fromkeys(test, '')
 
-for filename in os.listdir(dir):
-  tmp = pd.read_csv(os.path.join(dir, filename),skiprows=1).set_index("testset")
-  tmp = tmp[["accuracy", "roc score", "avg precision", "precision"]]
-  tmp.rename(columns={'accuracy': 'Accuracy', 'roc score': 'AUC', 'avg precision': 'Avg. precision', "precision": "Precision"}, inplace=True)
-  for key in models.keys():
-    if key in filename:
-      for model_test in test:
-        text[model_test] += f"{models[key]}         & {tmp['Accuracy'].loc[model_test]:.5f}          & {tmp['AUC'].loc[model_test]:.5f}         & {tmp['Avg. precision'].loc[model_test]:.5f}              & {tmp['Precision'].loc[model_test]:.5f}      \\\\ \hline\n"
+# for filename in os.listdir(dir):
+
+filename = "swin_tiny_0205_ProGAN-DDIM.csv"
+tmp = pd.read_csv(os.path.join(dir, filename),skiprows=1).set_index("testset")
+tmp = tmp[["accuracy", "roc score", "avg precision", "precision"]]
+tmp.rename(columns={'accuracy': 'Accuracy', 'roc score': 'AUC', 'avg precision': 'Avg. precision', "precision": "Precision"}, inplace=True)
+for key in models.keys():
+  if key in filename:
+    for model_test in test:
+      text[model_test] += f"{models[key]}         & {tmp['Accuracy'].loc[model_test]:.5f}          & {tmp['AUC'].loc[model_test]:.5f}         & {tmp['Avg. precision'].loc[model_test]:.5f}              & {tmp['Precision'].loc[model_test]:.5f}      \\\\ \hline\n"
 
 
 print("StyleGAN")

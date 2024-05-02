@@ -18,7 +18,7 @@ def evaluation(model_path, name, opt):
     # Running tests
     model_name = os.path.basename(model_path).replace('.pth', '')
     rows = [["{} model testing on...".format(name)],
-            ['testset', 'accuracy', 'avg precision', "f1 score", "roc score", "recall", "precision"]]
+            ['testset', 'accuracy', 'avg precision', "f1 score", "roc score", "precision", "recall"]]
 
     print("{} model testing on...".format(name))
 
@@ -35,7 +35,8 @@ def evaluation(model_path, name, opt):
     for v_id, test_model in enumerate(list_models):
             
         opt.no_resize = True    
-        opt.models = [test_model]
+        opt.models = [test_model, "real"]
+        # acc, ap, r_acc, f_acc, f1score, auc_score, prec, recall, y_true, y_pred
         acc, ap, r_acc, f_acc, f1, auc, prec, recall, _, _ = validate(model, opt, "test_list")
         rows.append([test_model, acc, ap, f1, auc, prec, recall])
         print("({}) acc: {}; ap: {}; r_acc: {}; f_acc: {} f1: {}; roc_auc: {}; recall: {}; precision: {}".format(test_model, acc, ap, r_acc, f_acc, f1, auc, recall, prec))
