@@ -30,8 +30,9 @@ text = dict.fromkeys(test, '')
 
 # for filename in os.listdir(dir):
 
-filename = "swin_tiny_0205_ProGAN-DDIM.csv"
-tmp = pd.read_csv(os.path.join(dir, filename),skiprows=1).set_index("testset")
+filename = "swin_tiny_0205_reduce_ProGAN-DDIM.csv"
+  # tmp = pd.read_csv(os.path.join(dir, filename),skiprows=1).set_index("testset")
+tmp = pd.read_csv("/home/abdallah/Deepfake-Detection/results/swin_tiny_0205_reduce_ProGAN-DDIM.csv",skiprows=1).set_index("testset")
 tmp = tmp[["accuracy", "roc score", "avg precision", "precision"]]
 tmp.rename(columns={'accuracy': 'Accuracy', 'roc score': 'AUC', 'avg precision': 'Avg. precision', "precision": "Precision"}, inplace=True)
 for key in models.keys():
