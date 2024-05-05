@@ -2,18 +2,8 @@ import os
 import torch
 import numpy as np
 from torch.utils.data.sampler import WeightedRandomSampler
-from .datasets import dataset_folder, get_dataset_metadata
-from .samplers import *
-
-
-def get_dataset(opt):
-    dset_lst = []
-    for cls in opt.classes:
-        root = opt.dataroot + '/' + cls
-        dset = dataset_folder(opt, root)
-        dset_lst.append(dset)
-    return torch.utils.data.ConcatDataset(dset_lst)
-
+from data.datasets import get_dataset_metadata
+from data.sampling import *
 
 def get_dataset_from_txt(opt, __type):
     images_list = get_images_list(opt, __type)
@@ -43,37 +33,18 @@ def get_images_list(opt, __type):
                     if model in opt.models:
                         images_list.append((cls.split("_")[0], os.path.join(opt.dataroot, model, line.strip())))
                         # e.g. (0, dataset/DDIM/00000.jpg)
+
     if __type == "train_list":
-        return upsampling(images_list, '0')
+        return multiply_class(images_list, '0')
     else:
         return images_list
-    # return balancing(images_list)
-
-# -------------------------------------------------------------------------------------------
-
-def get_bal_sampler(dataset):
-    targets = []
-    for d in dataset.datasets:
-        targets.extend(d.targets)
-
-    ratio = np.bincount(targets)
-    w = 1. / torch.tensor(ratio, dtype=torch.float)
-    sample_weights = w[targets]
-    sampler = WeightedRandomSampler(weights=sample_weights,
-                                    num_samples=len(sample_weights))
-    return sampler
-
+    
 
 def create_dataloader(opt, __type):
-    shuffle = not opt.serial_batches if (opt.isTrain and not opt.class_bal) else False
-    # -------------------------------------------------------------------------------------------
-    dataset = get_dataset(opt) if not opt.metadata else get_dataset_from_txt(opt, __type)
-    # -------------------------------------------------------------------------------------------
-    # sampler = get_bal_sampler(dataset) if opt.class_bal else None
-    # print(sampler)
+
+    dataset = get_dataset_from_txt(opt, __type)
     data_loader = torch.utils.data.DataLoader(dataset,
                                               batch_size=opt.batch_size,
-                                              shuffle=shuffle,
-                                            #   sampler=sampler,
                                               num_workers=int(opt.num_threads))
+    
     return data_loader
