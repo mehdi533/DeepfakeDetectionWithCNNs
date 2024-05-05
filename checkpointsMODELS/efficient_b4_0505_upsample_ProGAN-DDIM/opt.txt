@@ -9,13 +9,10 @@
                 class_bal: False                         
                   classes:                               
               compression: 0                             
-           continue_train: False                         
                  cropSize: 224                           
-                 data_aug: False                         
                  dataroot: ./dataset/                    
           earlystop_epoch: 5                             
                     epoch: latest                        
-              epoch_count: 1                             
                  filename:                               
                generators:                               
                   gpu_ids: 0                             
@@ -27,7 +24,6 @@
                jpg_method: cv2,pil                       	[default: cv2]
                  jpg_prob: 0                             
                  jpg_qual: 75                            
-               last_epoch: -1                            
                  loadSize: 256                           
                 loss_freq: 100                           
                        lr: 0.0001                        
@@ -35,18 +31,13 @@
                      mode: binary                        
                    models: real,ProGAN,DDIM              	[default: real]
                      name: 0505_upsample                 	[default: experiment_name]
-                new_optim: False                         
                     niter: 10000                         
                   no_flip: False                         
               num_threads: 1                             	[default: 4]
-                    optim: adam                          
            resize_or_crop: scale_and_crop                
                 rz_interp: bilinear                      
           save_epoch_freq: 20                            
-         save_latest_freq: 2000                          
            serial_batches: False                         
                    suffix:                               
-              train_split: train                         
-                val_split: val                           
-time is: 2024-05-05 14:39:01.828242
+time is: 2024-05-05 15:01:06.010256
 ----------------- End -------------------
