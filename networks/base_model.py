@@ -7,6 +7,7 @@ from torch.optim import lr_scheduler
 
 
 class BaseModel(nn.Module):
+    
     def __init__(self, opt):
         super(BaseModel, self).__init__()
         self.opt = opt

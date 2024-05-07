@@ -2,7 +2,7 @@ import functools
 import torch
 import torch.nn as nn
 # from networks.resnet import resnet50
-from networks.base_model import BaseModel #, init_weights
+from networks.base_model import BaseModel, init_weights
 # --------------------------------------------------------
 import torchvision.models as models
 from torchvision.models import VGG16_Weights
@@ -18,32 +18,27 @@ class Trainer(BaseModel):
     def __init__(self, opt):
         super(Trainer, self).__init__(opt)
 
-        # if self.isTrain and not opt.continue_train:
-        self.model = return_model(opt.arch, add=opt.intermediate, dim=opt.intermediate_dim)
-
-        # if not self.isTrain or opt.continue_train:
-        #     self.model = resnet50(num_classes=1)
+        if self.isTrain: # and not opt.continue_train:
+            self.model = load_custom_model(opt.arch, opt.intermediate, opt.intermediate_dim)
 
         if self.isTrain:
             self.loss_fn = nn.BCEWithLogitsLoss()
             # initialize optimizers
-            # opt.optim = 'adam'
             # if opt.optim == 'adam':
-            self.optimizer = torch.optim.Adam(self.model.parameters(),
-                                                  lr=opt.lr, betas=(opt.beta1, 0.999))
+            self.optimizer = torch.optim.Adam(self.model.parameters(), lr=0.0001,  betas=(0.9, 0.999))
+                                                #   lr=opt.lr, betas=(opt.beta1, 0.999))
             # elif opt.optim == 'sgd':
             #     self.optimizer = torch.optim.SGD(self.model.parameters(),
             #                                      lr=opt.lr, momentum=0.0, weight_decay=0)
             # else:
             #     raise ValueError("optim should be [adam, sgd]")
 
-        if not self.isTrain or opt.continue_train:
+        if not self.isTrain: #or opt.continue_train:
             self.load_networks(opt.epoch)
-
-        try:
-            self.model.to(self.device)
-        except IndexError:
-            self.model.to('cpu')
+        # try:
+        self.model.to(opt.gpu_ids[0])
+        # except IndexError:
+        #     self.model.to('cpu')
 
 
     def adjust_learning_rate(self, min_lr=1e-6):

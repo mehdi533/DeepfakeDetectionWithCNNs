@@ -1,0 +1,43 @@
+----------------- Options ---------------
+                     arch: efficient_b4                  	[default: res50]
+               batch_size: 64                            
+                    beta1: 0.9                           
+                blur_prob: 0                             
+                 blur_sig: 0.5                           
+                 blurring: 0                             
+          checkpoints_dir: ./checkpointsMODELS           
+                class_bal: False                         
+                  classes:                               
+              compression: 0                             
+                 cropSize: 224                           
+                 dataroot: ./dataset/                    
+          earlystop_epoch: 5                             
+                    epoch: latest                        
+                 filename:                               
+               generators:                               
+                  gpu_ids: 0                             
+                init_gain: 0.02                          
+                init_type: normal                        
+             intermediate: False                         
+         intermediate_dim: 64                            
+                  isTrain: True                          	[default: None]
+               jpg_method: cv2,pil                       	[default: cv2]
+                 jpg_prob: 0                             
+                 jpg_qual: 75                            
+                 loadSize: 256                           
+                loss_freq: 100                           
+                       lr: 0.0001                        
+                 metadata: ./dataset/Metadata/           	[default: ]
+                     mode: binary                        
+                   models: real,ProGAN,DDIM              	[default: real]
+                     name: 0505_upsample                 	[default: experiment_name]
+                    niter: 10000                         
+                  no_flip: False                         
+              num_threads: 1                             	[default: 4]
+           resize_or_crop: scale_and_crop                
+                rz_interp: bilinear                      
+          save_epoch_freq: 20                            
+           serial_batches: False                         
+                   suffix:                               
+time is: 2024-05-06 00:04:49.547221
+----------------- End -------------------

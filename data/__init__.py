@@ -1,6 +1,8 @@
+import os
 import torch
 import numpy as np
 from torch.utils.data.sampler import WeightedRandomSampler
+<<<<<<< HEAD
 
 from .datasets import get_dataset_metadata #, dataset_folder
 
@@ -17,14 +19,18 @@ from .datasets import get_dataset_metadata #, dataset_folder
 
 import os
 
+=======
+from data.datasets import get_dataset_metadata
+from data.sampling import *
+>>>>>>> updated_code
 
 def get_dataset_from_txt(opt, __type):
     images_list = get_images_list(opt, __type)
     # Returns a list of tuples. e.g. [(filename1, 0), (filename2, 0), ...]
     dataset = get_dataset_metadata(opt, images_list)
     return dataset
-            
-        
+
+
 def get_images_list(opt, __type):
 
     images_list = []  # [(filename1, 0), (filename2, 0), ...]
@@ -47,23 +53,13 @@ def get_images_list(opt, __type):
                         images_list.append((cls.split("_")[0], os.path.join(opt.dataroot, model, line.strip())))
                         # e.g. (0, dataset/DDIM/00000.jpg)
 
-    return images_list
+    if __type == "train_list":
+        return multiply_class(images_list, '0')
+    else:
+        return images_list
+    
 
-# -------------------------------------------------------------------------------------------
-
-def get_bal_sampler(dataset):
-    targets = []
-    for d in dataset.datasets:
-        targets.extend(d.targets)
-
-    ratio = np.bincount(targets)
-    w = 1. / torch.tensor(ratio, dtype=torch.float)
-    sample_weights = w[targets]
-    sampler = WeightedRandomSampler(weights=sample_weights,
-                                    num_samples=len(sample_weights))
-    return sampler
-
-
+<<<<<<< HEAD
 def create_dataloader(opt, _type):
     # shuffle = not opt.serial_batches if (opt.isTrain and not opt.class_bal) else False
 
@@ -79,5 +75,13 @@ def create_dataloader(opt, _type):
                                               batch_size=opt.batch_size,
                                             #   shuffle=shuffle,
                                             #   sampler=sampler,
+=======
+def create_dataloader(opt, __type):
+
+    dataset = get_dataset_from_txt(opt, __type)
+    data_loader = torch.utils.data.DataLoader(dataset,
+                                              batch_size=opt.batch_size,
+>>>>>>> updated_code
                                               num_workers=int(opt.num_threads))
+    
     return data_loader

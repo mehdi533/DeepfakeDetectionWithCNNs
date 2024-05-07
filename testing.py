@@ -1,7 +1,12 @@
 import os
 from eval import evaluation
 from options.test_options import TestOptions
+from util import *
 
+def model_arch(dir):
+    for name in models_names:
+        if name in dir:
+            return name
 
 if __name__ == "__main__":
 
@@ -11,16 +16,18 @@ if __name__ == "__main__":
     # resnet50_bs256_DDPM-PNDM/model_epoch_best.pth
     # python testing.py --name eval_resnet50 --batch_size 256 --model_path /home/abdallah/code/checkpoints/resnet50
     
-    for dir in os.listdir(opt.model_path):
-
-        """ resnet50_bs256_model1-model2-model3 """
+    for dir in os.listdir(opt.folder_path):
         
-        model_path = os.path.join(opt.model_path, dir, "model_epoch_best.pth")
-        parts = dir.split('_')  # Split by underscore
-        models = parts[-1]  # Get the last part
-        _type = str(parts[1:])
-        net = parts[0]
-    
-        name = opt.name + '_' + net + '_' + _type + '_bs' + str(opt.batch_size)
+        """ 
+        resnet50_name_GAN1-GAN2 
+        efficient_b0_name_GAN1-GAN2
+        """
+        
+        model_path = os.path.join(opt.folder_path, dir, "model_epoch_best.pth")
 
-        evaluation(model_path, name, opt)
+        # Possible models:
+        # res50, vgg16, resnext, swin_tiny, swin_base, swin_large, coatnet, efficient_b0, efficient_b4
+        
+        opt.arch = model_arch(dir)
+
+        evaluation(model_path, dir, opt)

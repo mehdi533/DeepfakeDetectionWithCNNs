@@ -4,8 +4,71 @@ import torchvision.models as models
 from torchvision.models.vgg import VGG16_Weights
 from torchvision.models.efficientnet import EfficientNet_B0_Weights, EfficientNet_B4_Weights
 from torchvision.models.resnet import ResNet50_Weights
-from transformers import AutoModel , AutoConfig
-    
+from transformers import SwinForImageClassification
+from transformers import AutoModel , AutoConfig, AutoTokenizer
+import timm
+
+
+def load_custom_model(name: str, intermediate, intermediate_dim):
+    model = None
+
+    if name == 'res50':
+        model = ResNet50(add_intermediate_layer = intermediate, intermediate_dim=intermediate_dim)
+    elif name == 'vgg16':
+        model = VGG16(add_intermediate_layer = intermediate, intermediate_dim=intermediate_dim)
+    elif name == 'efficient_b0':
+        model = EfficientNet_b0(add_intermediate_layer = intermediate, intermediate_dim=intermediate_dim)
+    elif name == 'efficient_b4':
+        model = EfficientNet_b4(add_intermediate_layer = intermediate, intermediate_dim=intermediate_dim)
+    elif name == 'swin_tiny':
+        model = HuggingModel("microsoft/swin-tiny-patch4-window7-224", 1) #["base_model.encoder.layers.3.blocks.1"]
+    elif name == 'swin_base':
+        model = HuggingModel("microsoft/swin-base-patch4-window7-224", 1)
+    elif name == 'swin_large':
+        model = HuggingModel("microsoft/swinv2-large-patch4-window12to16-192to256-22kto1k-ft", 1)
+    elif name == "coatnet":
+
+        class CustomHead(nn.Module):
+            def __init__(self, in_features, num_classes):
+                super(CustomHead, self).__init__()
+                self.global_pool = nn.AdaptiveAvgPool2d((1, 1))  # assuming avg pooling is needed
+                self.flatten = nn.Flatten()  # to flatten the pooled output
+                self.drop = nn.Dropout(p=0.0)  # adjust dropout probability if needed
+                self.fc = nn.Linear(in_features, num_classes)  # adjust num_classes as needed
+
+            def forward(self, x, pre_logits=None):
+                # Check if pre_logits is callable and use it if so
+                if callable(pre_logits):
+                    x = pre_logits(x)
+                x = self.global_pool(x)
+                x = self.flatten(x)
+                x = self.drop(x)
+                x = self.fc(x)
+                return x
+
+        # Assuming you're using the model 'coatnet_0_rw_224.sw_in1k' and want NUM_CLASSES as output
+        model = timm.create_model('coatnet_0_rw_224.sw_in1k', pretrained=True)
+        NUM_CLASSES = 1  # Set the number of classes as per your dataset requirement
+
+        # Replace the 'head' with your new custom head
+        model.head = CustomHead(in_features=768, num_classes=NUM_CLASSES)
+        model = model
+
+    elif name == "resnext":
+
+        model = timm.create_model('resnext101_32x8d', pretrained=True)
+
+        # Assuming the last layer was named 'head' and you verified it has an attribute 'in_features'
+        model.fc = nn.Sequential(
+            nn.Linear(model.fc.in_features, model.fc.in_features),
+            nn.ReLU(),
+            nn.Linear(model.fc.in_features, 1)
+        )
+    else:
+        raise ValueError("Model name should either be res50, vgg16, efficient_b0, or efficient_b4")
+
+    return model
+
 
 class HuggingModel(nn.Module):
     def __init__(self, base_mod_name, NUM_CLASSES=1, freeze_layers=None, additional_layers=False):

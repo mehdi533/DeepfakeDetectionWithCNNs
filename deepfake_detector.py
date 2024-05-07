@@ -3,7 +3,8 @@ import numpy as np
 import torch
 from networks.custom_models import *
 from sklearn.metrics import average_precision_score, precision_recall_curve, accuracy_score, f1_score, roc_auc_score, precision_score, recall_score
-
+import timm
+import torch.nn as nn
 
 def return_model(model, add=False, dim=64):
     if model == "res50":
@@ -13,9 +14,50 @@ def return_model(model, add=False, dim=64):
     elif model == "efficient_b0":
         return EfficientNet_b0(add_intermediate_layer=add, intermediate_dim=dim)
     elif model == "efficient_b4":
-        return EfficientNet_b4(add_intermediate_layer=add, intermediate_dim=dim)
-    elif model == "swin":
-        return HuggingModel("microsoft/swin-tiny-patch4-window7-224", additional_layers=add)
+        return EfficientNet_b4(add_intermediate_layer=True, intermediate_dim=dim)
+
+    elif model == 'swin_tiny':
+        return HuggingModel("microsoft/swin-tiny-patch4-window7-224", 1) #["base_model.encoder.layers.3.blocks.1"]
+
+    elif model == 'swin_base':
+        return HuggingModel("microsoft/swin-base-patch4-window7-224", 1)
+
+    elif model == 'swin_large':
+        return HuggingModel("microsoft/swinv2-large-patch4-window12to16-192to256-22kto1k-ft", 1)
+
+    elif model == "coatnet":
+        class CustomHead(nn.Module):
+            def __init__(self, in_features, num_classes):
+                super(CustomHead, self).__init__()
+                self.global_pool = nn.AdaptiveAvgPool2d((1, 1))  # assuming avg pooling is needed
+                self.flatten = nn.Flatten()  # to flatten the pooled output
+                self.drop = nn.Dropout(p=0.0)  # adjust dropout probability if needed
+                self.fc = nn.Linear(in_features, num_classes)  # adjust num_classes as needed
+
+            def forward(self, x, pre_logits=None):
+                # Check if pre_logits is callable and use it if so
+                if callable(pre_logits):
+                    x = pre_logits(x)
+                x = self.global_pool(x)
+                x = self.flatten(x)
+                x = self.drop(x)
+                x = self.fc(x)
+                return x
+        # Assuming you're using the model 'coatnet_0_rw_224.sw_in1k' and want NUM_CLASSES as output
+        model = timm.create_model('coatnet_0_rw_224.sw_in1k', pretrained=True)
+        NUM_CLASSES = 1  # Set the number of classes as per your dataset requirement
+        # Replace the 'head' with your new custom head
+        model.head = CustomHead(in_features=768, num_classes=NUM_CLASSES)
+        return model
+    elif model == "resnext":
+        net = timm.create_model('resnext101_32x8d', pretrained=True)
+        # Assuming the last layer was named 'head' and you verified it has an attribute 'in_features'
+        net.fc = nn.Sequential(
+            nn.Linear(net.fc.in_features, net.fc.in_features),
+            nn.ReLU(),
+            nn.Linear(net.fc.in_features, 1)
+        )
+        return net
     else:
         raise ValueError("Model name should either be res50, vgg16, efficient_b0, efficient_b4, or swin")
 
