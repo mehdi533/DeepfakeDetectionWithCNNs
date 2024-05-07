@@ -53,9 +53,12 @@ if __name__ == '__main__':
     val_writer = SummaryWriter(os.path.join(opt.checkpoints_dir, opt.filename, "val"))
 
     model = Trainer(opt)
-    early_stopping = EarlyStopping(patience=opt.earlystop_epoch, delta=-0.001, verbose=True)
+    # early_stopping = EarlyStopping(patience=opt.earlystop_epoch, delta=-0.001, verbose=True)
+    early_stopping = EarlyStopping(patience=5, delta=-0.001, verbose=True)
     
-    for epoch in range(opt.niter):
+    nb_epoch = 10000
+    # for epoch in range(opt.niter):
+    for epoch in range(nb_epoch):
 
         print(f"epoch number: {epoch}")
 

@@ -24,8 +24,8 @@ class Trainer(BaseModel):
             self.loss_fn = nn.BCEWithLogitsLoss()
             # initialize optimizers
             # if opt.optim == 'adam':
-            self.optimizer = torch.optim.Adam(self.model.parameters(),
-                                                  lr=opt.lr, betas=(opt.beta1, 0.999))
+            self.optimizer = torch.optim.Adam(self.model.parameters(), lr=0.0001,  betas=(0.9, 0.999))
+                                                #   lr=opt.lr, betas=(opt.beta1, 0.999))
             # elif opt.optim == 'sgd':
             #     self.optimizer = torch.optim.SGD(self.model.parameters(),
             #                                      lr=opt.lr, momentum=0.0, weight_decay=0)
