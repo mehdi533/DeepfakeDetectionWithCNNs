@@ -1,35 +1,16 @@
 import os
 import torch
 import numpy as np
-from torch.utils.data.sampler import WeightedRandomSampler
-<<<<<<< HEAD
-
-from .datasets import get_dataset_metadata #, dataset_folder
-
-# def get_dataset(opt):
-#     dset_lst = []
-#     for cls in opt.classes:
-#         root = opt.dataroot + '/' + cls
-#         dset = dataset_folder(opt, root)
-#         dset_lst.append(dset)
-#     return torch.utils.data.ConcatDataset(dset_lst)
-
-
-# -------------------------------------------------------------------------------------------
-
-import os
-
-=======
+# from torch.utils.data.sampler import WeightedRandomSampler
 from data.datasets import get_dataset_metadata
 from data.sampling import *
->>>>>>> updated_code
 
 def get_dataset_from_txt(opt, __type):
     images_list = get_images_list(opt, __type)
+    print(images_list)
     # Returns a list of tuples. e.g. [(filename1, 0), (filename2, 0), ...]
     dataset = get_dataset_metadata(opt, images_list)
     return dataset
-
 
 def get_images_list(opt, __type):
 
@@ -59,29 +40,11 @@ def get_images_list(opt, __type):
         return images_list
     
 
-<<<<<<< HEAD
-def create_dataloader(opt, _type):
-    # shuffle = not opt.serial_batches if (opt.isTrain and not opt.class_bal) else False
-
-    # print(shuffle)
-    
-    # dataset = get_dataset(opt) if not opt.metadata else get_dataset_from_txt(opt, __type)
-
-    dataset = get_dataset_from_txt(opt, _type)
-    # sampler = get_bal_sampler(dataset) if opt.class_bal else None
-
-    # print(sampler)
-    data_loader = torch.utils.data.DataLoader(dataset,
-                                              batch_size=opt.batch_size,
-                                            #   shuffle=shuffle,
-                                            #   sampler=sampler,
-=======
 def create_dataloader(opt, __type):
 
     dataset = get_dataset_from_txt(opt, __type)
     data_loader = torch.utils.data.DataLoader(dataset,
                                               batch_size=opt.batch_size,
->>>>>>> updated_code
                                               num_workers=int(opt.num_threads))
     
     return data_loader

@@ -2,13 +2,8 @@ import functools
 import torch
 import torch.nn as nn
 # from networks.resnet import resnet50
-from networks.base_model import BaseModel, init_weights
-# --------------------------------------------------------
-import torchvision.models as models
-from torchvision.models import VGG16_Weights
+from networks.base_model import BaseModel#, init_weights
 from networks.custom_models import *
-from deepfake_detector import return_model
-# --------------------------------------------------------
 
 
 class Trainer(BaseModel):

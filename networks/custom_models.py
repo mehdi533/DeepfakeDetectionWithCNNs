@@ -4,12 +4,31 @@ import torchvision.models as models
 from torchvision.models.vgg import VGG16_Weights
 from torchvision.models.efficientnet import EfficientNet_B0_Weights, EfficientNet_B4_Weights
 from torchvision.models.resnet import ResNet50_Weights
-from transformers import SwinForImageClassification
-from transformers import AutoModel , AutoConfig, AutoTokenizer
+from transformers import AutoModel , AutoConfig
 import timm
 
 
+class CustomHead(nn.Module):
+    def __init__(self, in_features, num_classes):
+        super(CustomHead, self).__init__()
+        self.global_pool = nn.AdaptiveAvgPool2d((1, 1))  # assuming avg pooling is needed
+        self.flatten = nn.Flatten()  # to flatten the pooled output
+        self.drop = nn.Dropout(p=0.0)  # adjust dropout probability if needed
+        self.fc = nn.Linear(in_features, num_classes)  # adjust num_classes as needed
+
+    def forward(self, x, pre_logits=None):
+        # Check if pre_logits is callable and use it if so
+        if callable(pre_logits):
+            x = pre_logits(x)
+        x = self.global_pool(x)
+        x = self.flatten(x)
+        x = self.drop(x)
+        x = self.fc(x)
+        return x
+            
+            
 def load_custom_model(name: str, intermediate, intermediate_dim):
+
     model = None
 
     if name == 'res50':
@@ -27,37 +46,14 @@ def load_custom_model(name: str, intermediate, intermediate_dim):
     elif name == 'swin_large':
         model = HuggingModel("microsoft/swinv2-large-patch4-window12to16-192to256-22kto1k-ft", 1)
     elif name == "coatnet":
-
-        class CustomHead(nn.Module):
-            def __init__(self, in_features, num_classes):
-                super(CustomHead, self).__init__()
-                self.global_pool = nn.AdaptiveAvgPool2d((1, 1))  # assuming avg pooling is needed
-                self.flatten = nn.Flatten()  # to flatten the pooled output
-                self.drop = nn.Dropout(p=0.0)  # adjust dropout probability if needed
-                self.fc = nn.Linear(in_features, num_classes)  # adjust num_classes as needed
-
-            def forward(self, x, pre_logits=None):
-                # Check if pre_logits is callable and use it if so
-                if callable(pre_logits):
-                    x = pre_logits(x)
-                x = self.global_pool(x)
-                x = self.flatten(x)
-                x = self.drop(x)
-                x = self.fc(x)
-                return x
-
         # Assuming you're using the model 'coatnet_0_rw_224.sw_in1k' and want NUM_CLASSES as output
         model = timm.create_model('coatnet_0_rw_224.sw_in1k', pretrained=True)
         NUM_CLASSES = 1  # Set the number of classes as per your dataset requirement
-
         # Replace the 'head' with your new custom head
         model.head = CustomHead(in_features=768, num_classes=NUM_CLASSES)
         model = model
-
     elif name == "resnext":
-
         model = timm.create_model('resnext101_32x8d', pretrained=True)
-
         # Assuming the last layer was named 'head' and you verified it has an attribute 'in_features'
         model.fc = nn.Sequential(
             nn.Linear(model.fc.in_features, model.fc.in_features),
@@ -66,7 +62,6 @@ def load_custom_model(name: str, intermediate, intermediate_dim):
         )
     else:
         raise ValueError("Model name should either be res50, vgg16, efficient_b0, or efficient_b4")
-
     return model
 
 
@@ -76,7 +71,6 @@ class HuggingModel(nn.Module):
         self.config = AutoConfig.from_pretrained(base_mod_name)
         self.base_model = AutoModel.from_pretrained(base_mod_name, config=self.config)
         
-        # Freeze layers if specified
         if freeze_layers:
             for name, param in self.base_model.named_parameters():
                 if any(layer in name for layer in freeze_layers):
@@ -84,27 +78,23 @@ class HuggingModel(nn.Module):
         
         if additional_layers:
             print('Additional')
-            # Add one or two linear layers for classification
             self.classifier = nn.Sequential(
                 nn.Linear(self.config.hidden_size, self.config.hidden_size),
                 nn.ReLU(),
                 nn.Linear(self.config.hidden_size, NUM_CLASSES)
             )
         else:
-            # Directly connect to a single linear layer for classification
             self.classifier = nn.Linear(self.config.hidden_size, NUM_CLASSES)
 
-        # Assuming the last hidden state has a shape of [batch, sequence_length, hidden_size]
-        # and you want to pool this to a shape of [batch, hidden_size]
-        self.pooler = torch.nn.AdaptiveAvgPool1d(1)
-        self.lin_layer = torch.nn.Linear(self.config.hidden_size, NUM_CLASSES)
+        self.pooler = nn.AdaptiveAvgPool1d(1)
+        self.lin_layer = nn.Linear(self.config.hidden_size, NUM_CLASSES)
 
     def forward(self, inputs):
         model_output = self.base_model(inputs)
-        features = model_output.last_hidden_state  # Assuming shape [batch, seq_len, hidden_size]
-        # Convert features from [batch, seq_len, hidden_size] to [batch, hidden_size, seq_len]
+        features = model_output.last_hidden_state  
+
         features = features.permute(0, 2, 1)
-        # Pool the features to shape [batch, hidden_size, 1] and remove the last dimension
+
         pooled_features = self.pooler(features).squeeze(-1)
         outs = self.lin_layer(pooled_features)
         return outs

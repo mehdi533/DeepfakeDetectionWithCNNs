@@ -7,17 +7,11 @@ class TestOptions(BaseOptions):
         parser = BaseOptions.initialize(self, parser)
 
         parser.add_argument('--model_path')
-<<<<<<< HEAD
-        # parser.add_argument('--no_resize', action='store_true')
-        # parser.add_argument('--no_crop', action='store_true')
-        parser.add_argument('--eval', action='store_true', help='use eval mode during test time.')
-=======
         parser.add_argument('--models_folder_path')
 
         # parser.add_argument('--no_resize', action='store_true')
         # parser.add_argument('--no_crop', action='store_true')
         # parser.add_argument('--eval', action='store_true', help='use eval mode during test time.')
->>>>>>> updated_code
 
         self.isTrain = False
         return parser

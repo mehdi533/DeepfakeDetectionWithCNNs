@@ -17,26 +17,15 @@ from options.train_options import TrainOptions
 def get_val_opt():
     # Takes same default options as training but modifies them for validation purposes
     val_opt = TrainOptions().parse(print_options=False)
-<<<<<<< HEAD
-
-=======
-    # ---------------------------------------- ----------------------------------------
-    #val_opt.dataroot = '{}/{}/'.format(val_opt.dataroot, val_opt.val_split)
-    # ---------------------------------------- ----------------------------------------
->>>>>>> updated_code
     # val_opt.isTrain = False
     # val_opt.no_resize = False
     # val_opt.no_crop = False
     # val_opt.serial_batches = True
-<<<<<<< HEAD
 
     # Difference between pil and cv2?
     # val_opt.jpg_method = ['pil']
 
     # Wtf is this, why would you apply blurring in validation or compression??
-=======
-    # val_opt.jpg_method = ['pil']
->>>>>>> updated_code
     # if len(val_opt.blur_sig) == 2:
     #     b_sig = val_opt.blur_sig
     #     val_opt.blur_sig = [(b_sig[0] + b_sig[1]) / 2]
@@ -64,14 +53,6 @@ if __name__ == '__main__':
 
     # Initializes model instance for training
     model = Trainer(opt)
-<<<<<<< HEAD
-    # Early stop implementation
-    early_stopping = EarlyStopping(patience=opt.earlystop_epoch, verbose=True, delta=-0.001)
-
-    for epoch in range(opt.nepoch):
-
-        print(f"Starting epoch number: {epoch}")
-=======
     # early_stopping = EarlyStopping(patience=opt.earlystop_epoch, delta=-0.001, verbose=True)
     early_stopping = EarlyStopping(patience=5, delta=-0.001, verbose=True)
     
@@ -81,7 +62,6 @@ if __name__ == '__main__':
 
         print(f"epoch number: {epoch}")
 
->>>>>>> updated_code
         epoch_start_time = time.time()
         iter_data_time = time.time()
         
@@ -93,10 +73,6 @@ if __name__ == '__main__':
             model.total_steps += 1
             epoch_iter += opt.batch_size
 
-<<<<<<< HEAD
-            # Sends image and label to device (gpu)
-=======
->>>>>>> updated_code
             model.set_input(data)
 
             model.optimize_parameters()
@@ -106,21 +82,13 @@ if __name__ == '__main__':
                 print("Train loss: {} at step: {}".format(model.loss, model.total_steps))
                 train_writer.add_scalar('loss', model.loss, model.total_steps)
 
-<<<<<<< HEAD
-            # Unnecessary
-    
-=======
->>>>>>> updated_code
             # if model.total_steps % opt.save_latest_freq == 0:
             #     print('saving the latest model %s (epoch %d, model.total_steps %d)' %
             #           (opt.name, epoch, model.total_steps))
             #     model.save_networks('latest')
-<<<<<<< HEAD
-=======
 
             # print("Iter time: %d sec" % (time.time()-iter_data_time))
             # iter_data_time = time.time()
->>>>>>> updated_code
 
         if epoch % opt.save_epoch_freq == 0:
             print('saving the model at the end of epoch %d, iters %d' %
@@ -130,8 +98,6 @@ if __name__ == '__main__':
 
         # Validation
         model.eval()
-<<<<<<< HEAD
-=======
         # # ---------------------------------------- ----------------------------------------
         # # acc, ap = validate(model.model, val_opt, "val_list")[:2]
         # acc, ap , _, _, f1score, auc_score, _, _, _, _ = validate(model.model, val_opt, "val_list")
@@ -144,7 +110,6 @@ if __name__ == '__main__':
         
         # early_stopping(acc, model)
 
->>>>>>> updated_code
 
         # returns: acc, ap, r_acc, f_acc, f1score, auc_score, prec, recall, y_true, y_pred
         acc, ap, _, _, f1score, roc_score, precision, _, _, _ = validate(model.model, val_opt, "val_list")
@@ -157,10 +122,6 @@ if __name__ == '__main__':
 
         print("Validation at epoch {} | accuracy: {}; average precision: {}".format(epoch, acc, ap))
 
-<<<<<<< HEAD
-        # Early stopping based on the accuracy
-        early_stopping(acc, model)
-=======
         # Early stopping based on the average precision achieved
         early_stopping(ap, model)
 
@@ -174,7 +135,6 @@ if __name__ == '__main__':
         #         break
         # model.train()
 
->>>>>>> updated_code
 
         if early_stopping.early_stop:
             continue_training = model.adjust_learning_rate()

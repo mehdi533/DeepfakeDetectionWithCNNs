@@ -3,13 +3,9 @@ import csv
 import torch
 
 from validate import validate
-#-----------–-----------–-----------–--------
-import torchvision.models as models
-import torch.nn as nn
 from networks.custom_models import *
 from deepfake_detector import Detector, return_model
 from data import create_dataloader
-#-----------–-----------–-----------–--------
 from options.test_options import TestOptions
 from eval_config import *
 
