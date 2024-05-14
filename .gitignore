@@ -1,5 +1,7 @@
 *.pyc
 __pycache__
 *.pth
+*.png
+*.jpg
 dataset
 envCNNDetect
