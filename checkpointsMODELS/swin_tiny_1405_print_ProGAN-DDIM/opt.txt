@@ -1,0 +1,38 @@
+----------------- Options ---------------
+                     arch: swin_tiny                     	[default: res50]
+               batch_size: 256                           	[default: 64]
+                blur_prob: 0                             
+                 blur_sig: 0.5                           
+                 blurring: 0                             
+          checkpoints_dir: ./checkpointsMODELS           
+                class_bal: False                         
+                  classes:                               
+              compression: 0                             
+                 cropSize: 224                           
+                 dataroot: ./dataset/                    
+          earlystop_epoch: 5                             
+                    epoch: latest                        
+                 filename:                               
+               generators:                               
+                  gpu_ids: 0                             
+                init_gain: 0.02                          
+                init_type: normal                        
+             intermediate: False                         
+         intermediate_dim: 64                            
+                  isTrain: True                          	[default: None]
+               jpg_method: cv2                           
+                 jpg_prob: 0                             
+                 jpg_qual: 75                            
+                 loadSize: 256                           
+                loss_freq: 100                           
+                 metadata: ./dataset/Metadata/           
+                     mode: binary                        
+                   models: real,ProGAN,DDIM              	[default: real]
+                     name: 1405_print                    	[default: experiment_name]
+                  no_flip: False                         
+              num_threads: 1                             
+           resize_or_crop: scale_and_crop                
+          save_epoch_freq: 20                            
+           serial_batches: False                         
+Date of start: 2024-05-14 08:07:37.178071
+----------------- End -------------------

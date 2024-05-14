@@ -3,9 +3,9 @@ import numpy as np
 from sklearn.metrics import average_precision_score, accuracy_score, f1_score, roc_auc_score, precision_score, recall_score
 from data import create_dataloader
 
-def validate(model, opt, __type):
+def validate(model, opt):
 
-    data_loader = create_dataloader(opt, __type)
+    data_loader = create_dataloader(opt, "val_list")
 
     with torch.no_grad():
         y_true, y_pred = [], []

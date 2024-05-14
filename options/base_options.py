@@ -17,9 +17,9 @@ class BaseOptions():
 
         # data augmentation
         # parser.add_argument('--rz_interp', default='bilinear')
-        # parser.add_argument('--blur_prob', type=float, default=0)
+        parser.add_argument('--blur_prob', type=float, default=0)
         parser.add_argument('--blur_sig', default='0.5')
-        # parser.add_argument('--jpg_prob', type=float, default=0)
+        parser.add_argument('--jpg_prob', type=float, default=0)
         parser.add_argument('--jpg_method', default='cv2')
         parser.add_argument('--jpg_qual', default='75')
         # -------------------------------------------------------------------------------------------
@@ -27,13 +27,13 @@ class BaseOptions():
         parser.add_argument('--blurring', type=int, default=0)
         # -------------------------------------------------------------------------------------------
 
-        # parser.add_argument('--dataroot', default='./dataset/', help='path to images (should have subfolders trainA, trainB, valA, valB, etc)')
-        # parser.add_argument('--classes', default='', help='image classes to train on')
-        # parser.add_argument('--generators', default='', help='image generators to train on')
-        # parser.add_argument('--class_bal', action='store_true')
+        parser.add_argument('--dataroot', default='./dataset/', help='path to images (should have subfolders trainA, trainB, valA, valB, etc)')
+        parser.add_argument('--classes', default='', help='image classes to train on')
+        parser.add_argument('--generators', default='', help='image generators to train on')
+        parser.add_argument('--class_bal', action='store_true')
         parser.add_argument('--batch_size', type=int, default=64, help='input batch size')
-        # parser.add_argument('--loadSize', type=int, default=256, help='scale images to this size')
-        # parser.add_argument('--cropSize', type=int, default=224, help='then crop to this size') # Eventually later
+        parser.add_argument('--loadSize', type=int, default=256, help='scale images to this size')
+        parser.add_argument('--cropSize', type=int, default=224, help='then crop to this size') # Eventually later
         parser.add_argument('--gpu_ids', type=str, default='0', help='gpu ids: e.g. 0  0,1,2, 0,2. use -1 for CPU')
         parser.add_argument('--name', type=str, default='experiment_name', help='name of the experiment. It decides where to store samples and models')
         parser.add_argument('--epoch', type=str, default='latest', help='which epoch to load? set to latest to use latest cached model')
@@ -102,9 +102,9 @@ class BaseOptions():
         opt.isTrain = self.isTrain   # train or test
 
         # process opt.suffix
-        if opt.suffix:
-            suffix = ('_' + opt.suffix.format(**vars(opt))) if opt.suffix != '' else ''
-            opt.name = opt.name + suffix
+        # if opt.suffix:
+        #     suffix = ('_' + opt.suffix.format(**vars(opt))) if opt.suffix != '' else ''
+        #     opt.name = opt.name + suffix
 
         if print_options:
             self.print_options(opt)
@@ -122,7 +122,7 @@ class BaseOptions():
 
         # additional
         # opt.classes = opt.classes.split(',')
-        opt.rz_interp = opt.rz_interp.split(',')
+        # opt.rz_interp = opt.rz_interp.split(',')
         opt.blur_sig = [float(s) for s in opt.blur_sig.split(',')]
         opt.jpg_method = opt.jpg_method.split(',')
         opt.jpg_qual = [int(s) for s in opt.jpg_qual.split(',')]

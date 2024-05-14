@@ -17,13 +17,13 @@ from options.train_options import TrainOptions
 def get_val_opt():
     # Takes same default options as training but modifies them for validation purposes
     val_opt = TrainOptions().parse(print_options=False)
-    # val_opt.isTrain = False
+    val_opt.isTrain = False
     # val_opt.no_resize = False
     # val_opt.no_crop = False
     # val_opt.serial_batches = True
 
     # Difference between pil and cv2?
-    # val_opt.jpg_method = ['pil']
+    val_opt.jpg_method = ['pil']
 
     # Wtf is this, why would you apply blurring in validation or compression??
     # if len(val_opt.blur_sig) == 2:
@@ -112,7 +112,7 @@ if __name__ == '__main__':
 
 
         # returns: acc, ap, r_acc, f_acc, f1score, auc_score, prec, recall, y_true, y_pred
-        acc, ap, _, _, f1score, roc_score, precision, _, _, _ = validate(model.model, val_opt, "val_list")
+        acc, ap, _, _, f1score, roc_score, precision, _, _, _ = validate(model.model, val_opt)
 
         val_writer.add_scalar('f1 Score', f1score, model.total_steps)
         val_writer.add_scalar('ROC Score', roc_score, model.total_steps)
