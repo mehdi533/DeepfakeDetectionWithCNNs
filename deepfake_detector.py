@@ -1,10 +1,15 @@
 import numpy as np
 import torch
-from networks.custom_models import *
 from sklearn.metrics import average_precision_score, accuracy_score, f1_score, roc_auc_score, precision_score, recall_score
 
-def voting_prediction(list_of_predictions):
+from networks.custom_models import load_custom_model
 
+
+def voting_prediction(list_of_predictions):
+    """
+    In this function is defined the how each model influences the 
+    attributed class of the image.
+    """
     list_of_predictions = list_of_predictions.T
 
     image_score = []
@@ -28,7 +33,7 @@ class Detector():
 
             print(f'Loading model {model_path.split("/")[-2]}...')
 
-            net = load_model(model_path.split('/')[-2])
+            net = load_custom_model(model_path.split('/')[-2])
             state_dict = torch.load(model_path, map_location='cpu')
             net.load_state_dict(state_dict['model'])
 
@@ -57,24 +62,6 @@ class Detector():
 
         y_true = np.array(y_true)
         y_pred = voting_prediction(np.array(y_pred_array))
-
-            # for img, label in data_loader:
-                
-            #     y_true.extend(label.flatten().tolist())
-            #     img_net_scores = []
-
-            #     for net_idx, net in enumerate(self.nets):
-            #         print(net_idx)
-            #         in_tens = img.cuda()
-            #         pred_temp = np.array(net(in_tens).sigmoid().flatten().tolist())
-            #         pred_temp_bin = pred_temp > 0.5
-
-            #         maj_voting = np.any(pred_temp_bin).astype(int)
-            #         scores_maj_voting = pred_temp[maj_voting]
-            #         img_net_scores.extend(np.nanmax(scores_maj_voting) if maj_voting == 1 else -np.nanmax(scores_maj_voting))
-                
-            #     print(img_net_scores)
-            #     y_pred.extend(np.mean(img_net_scores))
 
         return y_true, y_pred
     

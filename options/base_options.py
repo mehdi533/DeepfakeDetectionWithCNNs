@@ -12,31 +12,34 @@ class BaseOptions():
 
     def initialize(self, parser):
          
-        parser.add_argument('--mode', default='binary')
-        parser.add_argument('--arch', type=str, default='res50', help='architecture for binary classification')
-
+        # parser.add_argument('--mode', default='binary')
         # data augmentation
         # parser.add_argument('--rz_interp', default='bilinear')
-        parser.add_argument('--blur_prob', type=float, default=0)
-        parser.add_argument('--blur_sig', default='0.5')
-        parser.add_argument('--jpg_prob', type=float, default=0)
-        parser.add_argument('--jpg_method', default='cv2')
-        parser.add_argument('--jpg_qual', default='75')
-        # -------------------------------------------------------------------------------------------
+        # parser.add_argument('--blur_prob', type=float, default=0)
+        # parser.add_argument('--blur_sig', default='0.5')
+        # parser.add_argument('--jpg_prob', type=float, default=0)
+        # parser.add_argument('--jpg_method', default='cv2')
+        # parser.add_argument('--jpg_qual', default='75')
+        # parser.add_argument('--suffix', default='', type=str, help='customized suffix: opt.name = opt.name + suffix: e.g., {model}_{netG}_size{loadSize}')
+        # parser.add_argument('--loadSize', type=int, default=256, help='scale images to this size')
+        # parser.add_argument('--epoch', type=str, default='latest', help='which epoch to load? set to latest to use latest cached model')
+        # parser.add_argument('--classes', default='', help='image classes to train on')
+
+        parser.add_argument('--arch', type=str, default='res50', help='architecture for binary classification')
+        
         parser.add_argument('--compression', type=int, default=0)
         parser.add_argument('--blurring', type=int, default=0)
-        # -------------------------------------------------------------------------------------------
 
         parser.add_argument('--dataroot', default='./dataset/', help='path to images (should have subfolders trainA, trainB, valA, valB, etc)')
-        parser.add_argument('--classes', default='', help='image classes to train on')
+        
         parser.add_argument('--generators', default='', help='image generators to train on')
         parser.add_argument('--class_bal', action='store_true')
         parser.add_argument('--batch_size', type=int, default=64, help='input batch size')
-        parser.add_argument('--loadSize', type=int, default=256, help='scale images to this size')
+        
         parser.add_argument('--cropSize', type=int, default=224, help='then crop to this size') # Eventually later
         parser.add_argument('--gpu_ids', type=str, default='0', help='gpu ids: e.g. 0  0,1,2, 0,2. use -1 for CPU')
         parser.add_argument('--name', type=str, default='experiment_name', help='name of the experiment. It decides where to store samples and models')
-        parser.add_argument('--epoch', type=str, default='latest', help='which epoch to load? set to latest to use latest cached model')
+        
         parser.add_argument('--num_threads', default=1, type=int, help='# threads for loading data')
         parser.add_argument('--checkpoints_dir', type=str, default='./checkpointsMODELS', help='models are saved here')
         parser.add_argument('--serial_batches', action='store_true', help='if true, takes images in order to make batches, otherwise takes them randomly')
@@ -44,8 +47,7 @@ class BaseOptions():
         parser.add_argument('--no_flip', action='store_true', help='if specified, do not flip the images for data augmentation')
         parser.add_argument('--init_type', type=str, default='normal', help='network initialization [normal|xavier|kaiming|orthogonal]')
         parser.add_argument('--init_gain', type=float, default=0.02, help='scaling factor for normal, xavier and orthogonal.')
-        # parser.add_argument('--suffix', default='', type=str, help='customized suffix: opt.name = opt.name + suffix: e.g., {model}_{netG}_size{loadSize}')
-        # -------------------------------------------------------------------------------------------
+        
         parser.add_argument('--metadata', type=str, default='./dataset/Metadata/', help='directory with list of real/fake images')
         parser.add_argument('--models', default='real', help='models to take into account')
         parser.add_argument('--filename', default='', help='filename to save')
@@ -123,13 +125,13 @@ class BaseOptions():
         # additional
         # opt.classes = opt.classes.split(',')
         # opt.rz_interp = opt.rz_interp.split(',')
-        opt.blur_sig = [float(s) for s in opt.blur_sig.split(',')]
-        opt.jpg_method = opt.jpg_method.split(',')
-        opt.jpg_qual = [int(s) for s in opt.jpg_qual.split(',')]
-        if len(opt.jpg_qual) == 2:
-            opt.jpg_qual = list(range(opt.jpg_qual[0], opt.jpg_qual[1] + 1))
-        elif len(opt.jpg_qual) > 2:
-            raise ValueError("Shouldn't have more than 2 values for --jpg_qual.")
+        # opt.blur_sig = [float(s) for s in opt.blur_sig.split(',')]
+        # opt.jpg_method = opt.jpg_method.split(',')
+        # opt.jpg_qual = [int(s) for s in opt.jpg_qual.split(',')]
+        # if len(opt.jpg_qual) == 2:
+        #     opt.jpg_qual = list(range(opt.jpg_qual[0], opt.jpg_qual[1] + 1))
+        # elif len(opt.jpg_qual) > 2:
+        #     raise ValueError("Shouldn't have more than 2 values for --jpg_qual.")
         # ------------------------------------------------------------------------
         opt.models = opt.models.split(',')
         mod = "-".join(map(str, opt.models[1:]))

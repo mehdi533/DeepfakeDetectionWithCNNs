@@ -2,13 +2,15 @@ import os
 import csv
 import torch
 
+from util import mkdir
 from validate import validate
-from networks.custom_models import *
-from deepfake_detector import Detector, return_model
+from networks.custom_models import load_custom_model
+from deepfake_detector import Detector
 from data import create_dataloader
 from options.test_options import TestOptions
-from eval_config import *
 
+results_dir = './results/'
+mkdir(results_dir)
 
 def evaluation(model_path, name, opt):
     # Running tests
@@ -21,7 +23,7 @@ def evaluation(model_path, name, opt):
     # ---------------------------------------------------------------------
     list_models = ["StyleGAN", "VQGAN", "PNDM", "DDPM", "LDM", "DDIM", "ProGAN"]
     
-    model = return_model(opt.arch, add=opt.intermediate, dim=opt.intermediate_dim)
+    model = load_custom_model(opt.arch, add=opt.intermediate, dim=opt.intermediate_dim)
         
     state_dict = torch.load(model_path, map_location='cpu')
     model.load_state_dict(state_dict['model'])
@@ -32,8 +34,11 @@ def evaluation(model_path, name, opt):
             
         opt.no_resize = True    
         opt.models = [test_model, "real"]
-        # acc, ap, r_acc, f_acc, f1score, auc_score, prec, recall, y_true, y_pred
+        
+        # returns: acc, ap, r_acc, f_acc, f1score, auc_score, prec, recall, y_true, y_pred
         acc, ap, r_acc, f_acc, f1, auc, prec, recall, _, _ = validate(model, opt, "test_list")
+
+        # Apprend rows to save as csv
         rows.append([test_model, acc, ap, f1, auc, prec, recall])
         print("({}) acc: {}; ap: {}; r_acc: {}; f_acc: {} f1: {}; roc_auc: {}; recall: {}; precision: {}".format(test_model, acc, ap, r_acc, f_acc, f1, auc, recall, prec))
 

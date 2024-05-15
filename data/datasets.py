@@ -48,32 +48,32 @@ def get_dataset_metadata(opt, image_list):
 
     if opt.blurring:
         print("Blurring Active")
-        transform_blur = transforms.Compose([transforms.Lambda(lambda img: blurring(img, opt)), transform])
+        transform_blur = transforms.Compose([transforms.Lambda(lambda img: blurring(img)), transform])
         dataset = ConcatDataset([dataset, DatasetFromMetadata(image_list, transform_blur)])
     
     if opt.compression:
         print("Compression Active")
-        transform_comp = transforms.Compose([transforms.Lambda(lambda img: compressing(img, opt)), transform])
+        transform_comp = transforms.Compose([transforms.Lambda(lambda img: compressing(img)), transform])
         dataset = ConcatDataset([dataset, DatasetFromMetadata(image_list, transform_comp)])
 
     return dataset
 
 
-def compressing(img, opt):
+def compressing(img, jpg_method='cv2', jpg_qual=75):
     img = np.array(img)
 
-    method = sample_discrete(opt.jpg_method)
-    qual = sample_discrete(opt.jpg_qual)
+    method = sample_discrete(jpg_method)
+    qual = sample_discrete(jpg_qual)
     img = jpeg_from_key(img, qual, method)
 
     return Image.fromarray(img)
 
 
-def blurring(img, opt):
+def blurring(img, blur_prob=0, blur_sig=0.5):
     img = np.array(img)
 
-    if random() < opt.blur_prob:
-        sig = sample_continuous(opt.blur_sig)
+    if random() < blur_prob:
+        sig = sample_continuous(blur_sig)
         gaussian_blur(img, sig)
     
     return Image.fromarray(img)
@@ -125,11 +125,11 @@ def jpeg_from_key(img, compress_val, key):
     return method(img, compress_val)
 
 
-rz_dict = {'bilinear': Image.BILINEAR,
-           'bicubic': Image.BICUBIC,
-           'lanczos': Image.LANCZOS,
-           'nearest': Image.NEAREST}
+# rz_dict = {'bilinear': Image.BILINEAR,
+#            'bicubic': Image.BICUBIC,
+#            'lanczos': Image.LANCZOS,
+#            'nearest': Image.NEAREST}
 
-def custom_resize(img, opt):
-    interp = sample_discrete(opt.rz_interp)
-    return TF.resize(img, opt.loadSize, interpolation=rz_dict[interp])
+# def custom_resize(img, rz_interp='bilinear', loadSize=256):
+#     interp = sample_discrete(rz_interp)
+#     return TF.resize(img, loadSize, interpolation=rz_dict[interp])

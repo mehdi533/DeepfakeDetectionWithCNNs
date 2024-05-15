@@ -14,4 +14,5 @@ class TestOptions(BaseOptions):
         # parser.add_argument('--eval', action='store_true', help='use eval mode during test time.')
 
         self.isTrain = False
+        
         return parser

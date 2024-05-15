@@ -18,23 +18,16 @@ class Trainer(BaseModel):
 
         if self.isTrain:
             self.loss_fn = nn.BCEWithLogitsLoss()
-            # initialize optimizers
-            # if opt.optim == 'adam':
-            self.optimizer = torch.optim.Adam(self.model.parameters(), lr=0.0001,  betas=(0.9, 0.999))
-                                                #   lr=opt.lr, betas=(opt.beta1, 0.999))
-            # elif opt.optim == 'sgd':
-            #     self.optimizer = torch.optim.SGD(self.model.parameters(),
-            #                                      lr=opt.lr, momentum=0.0, weight_decay=0)
-            # else:
-            #     raise ValueError("optim should be [adam, sgd]")
+            # Pre-defined betas and lr
+            betas = (0.9, 0.999)
+            lr = 0.0001
+            self.optimizer = torch.optim.Adam(self.model.parameters(), lr=lr,  betas=betas)
 
-        if not self.isTrain: #or opt.continue_train:
-            self.load_networks(opt.epoch)
-        # try:
+        # Obsolete since 
+        if not self.isTrain:
+            self.load_networks("latest")
+
         self.model.to(opt.gpu_ids[0])
-        # except IndexError:
-        #     self.model.to('cpu')
-
 
     def adjust_learning_rate(self, min_lr=1e-6):
         for param_group in self.optimizer.param_groups:
@@ -47,17 +40,11 @@ class Trainer(BaseModel):
         self.input = input[0].to(self.device)
         self.label = input[1].to(self.device).float()
 
-
     def forward(self):
         self.output = self.model(self.input)
 
-    # def get_loss(self):
-    #     return self.loss_fn(self.output.squeeze(1), self.label)
-        # return self.loss_fn(self.output, self.label)
-
     def optimize_parameters(self):
         self.forward()
-        # self.loss = self.loss_fn(self.output.squeeze(1), self.label)
         self.loss = self.loss_fn(self.output.squeeze(1), self.label)
         self.optimizer.zero_grad()
         self.loss.backward()
