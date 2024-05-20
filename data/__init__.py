@@ -7,7 +7,7 @@ from data.sampling import *
 
 def get_dataset_from_txt(opt, __type):
     images_list = get_images_list(opt, __type)
-    print(images_list)
+    # print(images_list)
     # Returns a list of tuples. e.g. [(filename1, 0), (filename2, 0), ...]
     dataset = get_dataset_metadata(opt, images_list)
     return dataset
@@ -42,9 +42,10 @@ def get_images_list(opt, __type):
 
 def create_dataloader(opt, __type):
 
+    # Number of threads to use
+    num_threads = 1
+
     dataset = get_dataset_from_txt(opt, __type)
-    data_loader = torch.utils.data.DataLoader(dataset,
-                                              batch_size=opt.batch_size,
-                                              num_workers=int(opt.num_threads))
+    data_loader = torch.utils.data.DataLoader(dataset, batch_size=opt.batch_size, num_workers=num_threads)
     
     return data_loader

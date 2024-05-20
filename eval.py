@@ -23,7 +23,7 @@ def evaluation(model_path, name, opt):
     # ---------------------------------------------------------------------
     list_models = ["StyleGAN", "VQGAN", "PNDM", "DDPM", "LDM", "DDIM", "ProGAN"]
     
-    model = load_custom_model(opt.arch, add=opt.intermediate, dim=opt.intermediate_dim)
+    model = load_custom_model(opt.arch, opt.intermediate, opt.intermediate_dim)
         
     state_dict = torch.load(model_path, map_location='cpu')
     model.load_state_dict(state_dict['model'])

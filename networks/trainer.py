@@ -27,7 +27,7 @@ class Trainer(BaseModel):
         if not self.isTrain:
             self.load_networks("latest")
 
-        self.model.to(opt.gpu_ids[0])
+        self.model.to(self.device)
 
     def adjust_learning_rate(self, min_lr=1e-6):
         for param_group in self.optimizer.param_groups:

@@ -1,5 +1,5 @@
 ----------------- Options ---------------
-                     arch: swin_tiny                     	[default: res50]
+                     arch: res50                         
                batch_size: 256                           	[default: 64]
                  blurring: 0                             
           checkpoints_dir: ./checkpointsMODELS           
@@ -13,7 +13,7 @@
          intermediate_dim: 64                            
                   isTrain: True                          	[default: None]
                  metadata: ./dataset/Metadata/           
-                   models: real,ProGAN,DDIM              	[default: real]
-                     name: 1405_print                    	[default: experiment_name]
-Date of start: 2024-05-17 12:56:57.366251
+                   models: real,ProGAN                   	[default: real]
+                     name: 1905                          	[default: experiment_name]
+Date of start: 2024-05-19 09:30:00.150727
 ----------------- End -------------------

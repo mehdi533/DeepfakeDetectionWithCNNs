@@ -4,7 +4,7 @@ import torchvision.models as models
 from torchvision.models.vgg import VGG16_Weights
 from torchvision.models.efficientnet import EfficientNet_B0_Weights, EfficientNet_B4_Weights
 from torchvision.models.resnet import ResNet50_Weights
-from transformers import AutoModel , AutoConfig
+from transformers import AutoModel, AutoConfig
 import timm
 
 
@@ -187,7 +187,8 @@ class ResNet50(nn.Module):
         super(ResNet50, self).__init__()
         
         # Load pre-trained ResNet50 model
-        self.model = models.resnet50(weights=ResNet50_Weights.DEFAULT)
+        # self.model = models.resnet50(weights=ResNet50_Weights.DEFAULT)
+        self.model = models.resnet50(weights=None)
 
         # Get the number of input features for the final fully connected layer
         num_ftrs = self.model.fc.in_features

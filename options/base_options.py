@@ -37,16 +37,16 @@ class BaseOptions():
         parser.add_argument('--batch_size', type=int, default=64, help='input batch size')
         
         parser.add_argument('--cropSize', type=int, default=224, help='then crop to this size') # Eventually later
-        parser.add_argument('--gpu_ids', type=str, default='0', help='gpu ids: e.g. 0  0,1,2, 0,2. use -1 for CPU')
+        # parser.add_argument('--gpu_ids', type=str, default='0', help='gpu ids: e.g. 0  0,1,2, 0,2. use -1 for CPU')
         parser.add_argument('--name', type=str, default='experiment_name', help='name of the experiment. It decides where to store samples and models')
         
-        parser.add_argument('--num_threads', default=1, type=int, help='# threads for loading data')
+        # parser.add_argument('--num_threads', default=1, type=int, help='# threads for loading data')
         parser.add_argument('--checkpoints_dir', type=str, default='./checkpointsMODELS', help='models are saved here')
-        parser.add_argument('--serial_batches', action='store_true', help='if true, takes images in order to make batches, otherwise takes them randomly')
-        parser.add_argument('--resize_or_crop', type=str, default='scale_and_crop', help='scaling and cropping of images at load time [resize_and_crop|crop|scale_width|scale_width_and_crop|none]')
-        parser.add_argument('--no_flip', action='store_true', help='if specified, do not flip the images for data augmentation')
-        parser.add_argument('--init_type', type=str, default='normal', help='network initialization [normal|xavier|kaiming|orthogonal]')
-        parser.add_argument('--init_gain', type=float, default=0.02, help='scaling factor for normal, xavier and orthogonal.')
+        # parser.add_argument('--serial_batches', action='store_true', help='if true, takes images in order to make batches, otherwise takes them randomly')
+        # parser.add_argument('--resize_or_crop', type=str, default='scale_and_crop', help='scaling and cropping of images at load time [resize_and_crop|crop|scale_width|scale_width_and_crop|none]')
+        # parser.add_argument('--no_flip', action='store_true', help='if specified, do not flip the images for data augmentation')
+        # parser.add_argument('--init_type', type=str, default='normal', help='network initialization [normal|xavier|kaiming|orthogonal]')
+        # parser.add_argument('--init_gain', type=float, default=0.02, help='scaling factor for normal, xavier and orthogonal.')
         
         parser.add_argument('--metadata', type=str, default='./dataset/Metadata/', help='directory with list of real/fake images')
         parser.add_argument('--models', default='real', help='models to take into account')
@@ -112,14 +112,14 @@ class BaseOptions():
             self.print_options(opt)
 
         # set gpu ids
-        str_ids = opt.gpu_ids.split(',')
-        opt.gpu_ids = []
-        for str_id in str_ids:
-            id = int(str_id)
-            if id >= 0:
-                opt.gpu_ids.append(id)
-        if len(opt.gpu_ids) > 0:
-            torch.cuda.set_device(opt.gpu_ids[0])
+        # str_ids = opt.gpu_ids.split(',')
+        # opt.gpu_ids = []
+        # for str_id in str_ids:
+        #     id = int(str_id)
+        #     if id >= 0:
+        #         opt.gpu_ids.append(id)
+        # if len(opt.gpu_ids) > 0:
+        #     torch.cuda.set_device(opt.gpu_ids[0])
 
 
         # additional

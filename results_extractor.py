@@ -32,24 +32,28 @@ text = dict.fromkeys(test, '')
 
 # for filename in os.listdir(dir):
 
-filename = "swin_tiny_0205_reduce_ProGAN-DDIM.csv"
+filename = "swin_tiny_1705_ProGAN.csv"
   # tmp = pd.read_csv(os.path.join(dir, filename),skiprows=1).set_index("testset")
-tmp = pd.read_csv("/home/abdallah/Deepfake-Detection/results/swin_tiny_0205_reduce_ProGAN-DDIM.csv",skiprows=1).set_index("testset")
+tmp = pd.read_csv("/home/abdallah/Deepfake-Detection/results/swin_tiny_1705_ProGAN.csv",skiprows=1).set_index("testset")
 tmp = tmp[["accuracy", "roc score", "avg precision", "precision"]]
 tmp.rename(columns={'accuracy': 'Accuracy', 'roc score': 'AUC', 'avg precision': 'Avg. precision', "precision": "Precision"}, inplace=True)
 for key in models.keys():
   if key in filename:
     for model_test in test:
-      text[model_test] += f"{models[key]}         & {tmp['Accuracy'].loc[model_test]:.5f}          & {tmp['AUC'].loc[model_test]:.5f}         & {tmp['Avg. precision'].loc[model_test]:.5f}              & {tmp['Precision'].loc[model_test]:.5f}      \\\\ \hline\n"
+      text[model_test] += f"{model_test}         & {tmp['Accuracy'].loc[model_test]:.5f}          & {tmp['AUC'].loc[model_test]:.5f}         & {tmp['Avg. precision'].loc[model_test]:.5f}              & {tmp['Precision'].loc[model_test]:.5f}      \\\\ \hline\n"
 
 
-print("StyleGAN")
+
+print(text["ProGAN"])
+# print("StyleGAN")
 print(text["StyleGAN"])
-print("VQGAN")
+# print("VQGAN")
 print(text["VQGAN"])
-print("LDM")
+# print("LDM")
 print(text["LDM"])
-print("DDPM")
+# print("DDPM")
 print(text["DDPM"])
-print("PNDM")
+
+print(text["DDIM"])
+# print("PNDM")
 print(text["PNDM"])
