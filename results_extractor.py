@@ -17,32 +17,50 @@ models = {"efficient_b0":"Efficient b0",\
 "vgg16":"VGG16",\
 "res50":"Resnet50",\
 "resnext":"ResNext",\
-"coatnet":"CoAtNet"}
+"coatnet":"CoAtNet",\
+"bit": "BiT",\
+"vit_base": "ViT Base",\
+"vit_large": "ViT Large",\
+"deit_base": "DeiT Base"}
 
 import pandas as pd
 import os
 
 pd.DataFrame(columns=["Accuracy", "AUC", "Avg. precision", "Precision"])
 
-dir = "results/MODELS2/"
+# dir = "results/MODELS2/"
 
-test = ["StyleGAN", "VQGAN", "PNDM", "DDPM", "LDM", "DDIM", "ProGAN"]
+test = ["FFpp1", "FFpp2", "FFpp3", "FFpp4", "StyleGAN", "VQGAN", "PNDM", "DDPM", "LDM", "DDIM", "ProGAN"]
 
 text = dict.fromkeys(test, '')
 
 # for filename in os.listdir(dir):
 
-filename = "swin_tiny_1705_ProGAN.csv"
+filename = "/home/abdallah/Deepfake-Detection/results/bit_2905_ProGAN.csv"
   # tmp = pd.read_csv(os.path.join(dir, filename),skiprows=1).set_index("testset")
-tmp = pd.read_csv("/home/abdallah/Deepfake-Detection/results/swin_tiny_1705_ProGAN.csv",skiprows=1).set_index("testset")
+tmp = pd.read_csv(filename,skiprows=1).set_index("testset")
 tmp = tmp[["accuracy", "roc score", "avg precision", "precision"]]
 tmp.rename(columns={'accuracy': 'Accuracy', 'roc score': 'AUC', 'avg precision': 'Avg. precision', "precision": "Precision"}, inplace=True)
 for key in models.keys():
   if key in filename:
     for model_test in test:
-      text[model_test] += f"{model_test}         & {tmp['Accuracy'].loc[model_test]:.5f}          & {tmp['AUC'].loc[model_test]:.5f}         & {tmp['Avg. precision'].loc[model_test]:.5f}              & {tmp['Precision'].loc[model_test]:.5f}      \\\\ \hline\n"
+      if "FFpp" not in model_test:
+        name = model_test
+      if model_test == "FFpp1":
+        name = "Deepfakes"
+      if model_test == "FFpp2":
+        name = "Face2Face"
+      if model_test == "FFpp3":
+        name = "FaceSwap"
+      if model_test == "FFpp4":
+        name = "NeuralTextures"
+      text[model_test] += f"{name}         & {tmp['Accuracy'].loc[model_test]:.5f}          & {tmp['AUC'].loc[model_test]:.5f}         & {tmp['Avg. precision'].loc[model_test]:.5f}              & {tmp['Precision'].loc[model_test]:.5f}      \\\\ \hline\n"
 
 
+print(text["FFpp1"])
+print(text["FFpp2"])
+print(text["FFpp3"])
+print(text["FFpp4"])
 
 print(text["ProGAN"])
 # print("StyleGAN")

@@ -36,14 +36,12 @@ def get_images_list(opt, __type):
 
     if __type == "train_list":
         return multiply_class(images_list, '0')
+        # return images_list
     else:
         return images_list
     
 
-def create_dataloader(opt, __type):
-
-    # Number of threads to use
-    num_threads = 1
+def create_dataloader(opt, __type, num_threads = 1):
 
     dataset = get_dataset_from_txt(opt, __type)
     data_loader = torch.utils.data.DataLoader(dataset, batch_size=opt.batch_size, num_workers=num_threads)

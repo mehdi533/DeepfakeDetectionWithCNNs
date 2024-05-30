@@ -1,0 +1,19 @@
+----------------- Options ---------------
+                     arch: deit_base                     	[default: res50]
+               batch_size: 128                           	[default: 64]
+                 blurring: 0                             
+          checkpoints_dir: ./checkpointsMODELS           
+                class_bal: False                         
+              compression: 0                             
+                 cropSize: 224                           
+                 dataroot: ./dataset/                    
+                 filename:                               
+               generators:                               
+             intermediate: False                         
+         intermediate_dim: 64                            
+                  isTrain: True                          	[default: None]
+                 metadata: ./dataset/Metadata/           
+                   models: real,ProGAN                   	[default: real]
+                     name: 2805                          	[default: experiment_name]
+Date of start: 2024-05-28 09:07:33.258416
+----------------- End -------------------

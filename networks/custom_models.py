@@ -40,11 +40,11 @@ def load_custom_model(name: str, intermediate, intermediate_dim):
     elif name == 'efficient_b4':
         model = EfficientNet_b4(add_intermediate_layer = intermediate, intermediate_dim=intermediate_dim)
     elif name == 'swin_tiny':
-        model = HuggingModel("microsoft/swin-tiny-patch4-window7-224", 1) #["base_model.encoder.layers.3.blocks.1"]
+        model = HuggingModel("microsoft/swin-tiny-patch4-window7-224") #["base_model.encoder.layers.3.blocks.1"]
     elif name == 'swin_base':
-        model = HuggingModel("microsoft/swin-base-patch4-window7-224", 1)
+        model = HuggingModel("microsoft/swin-base-patch4-window7-224")
     elif name == 'swin_large':
-        model = HuggingModel("microsoft/swinv2-large-patch4-window12to16-192to256-22kto1k-ft", 1)
+        model = HuggingModel("microsoft/swinv2-large-patch4-window12to16-192to256-22kto1k-ft")
     elif name == "coatnet":
         # Assuming you're using the model 'coatnet_0_rw_224.sw_in1k' and want NUM_CLASSES as output
         model = timm.create_model('coatnet_0_rw_224.sw_in1k', pretrained=True)
@@ -60,6 +60,21 @@ def load_custom_model(name: str, intermediate, intermediate_dim):
             nn.ReLU(),
             nn.Linear(model.fc.in_features, 1)
         )
+    elif name == "vit_base":
+        model = HuggingModel("google/vit-base-patch16-224")
+
+    elif name == "vit_large":
+        model = HuggingModel("google/vit-large-patch16-224")
+
+    elif name == "deit_base":
+        model = HuggingModel("facebook/deit-base-distilled-patch16-224")
+
+    elif name == "deit_small":
+        model = HuggingModel("facebook/deit-small-distilled-patch16-224")
+
+    elif name == "bit":
+        model = BiTModel("google/bit-50")
+        
     else:
         raise ValueError("Model name should either be res50, vgg16, efficient_b0, or efficient_b4")
     return model
@@ -99,6 +114,48 @@ class HuggingModel(nn.Module):
         outs = self.lin_layer(pooled_features)
         return outs
     
+
+import torch
+import torch.nn as nn
+from transformers import BitImageProcessor, BitForImageClassification
+
+class BiTModel(nn.Module):
+    def __init__(self, base_mod_name, num_classes=1, freeze_layers=None, additional_layers=False):
+        super().__init__()
+        self.base_model = BitForImageClassification.from_pretrained(base_mod_name)
+        self.processor = BitImageProcessor.from_pretrained(base_mod_name)
+
+        if isinstance(self.base_model.classifier, nn.Sequential):
+            for layer in self.base_model.classifier:
+                if isinstance(layer, nn.Linear):
+                    hidden_size = layer.out_features
+                    break
+        elif hasattr(self.base_model.classifier, 'in_features'):
+            hidden_size = self.base_model.classifier.in_features
+        else:
+            raise ValueError("Cannot determine hidden size from the model classifier")
+
+        # Freeze specified layers
+        if freeze_layers:
+            for name, param in self.base_model.named_parameters():
+                if any(layer in name for layer in freeze_layers):
+                    param.requires_grad = False
+
+        if additional_layers:
+            print('Using additional layers')
+            self.classifier = nn.Sequential(
+                nn.Linear(hidden_size, hidden_size),
+                nn.ReLU(),
+                nn.Linear(hidden_size, num_classes)
+            )
+        else:
+            self.classifier = nn.Linear(hidden_size, num_classes)
+
+    def forward(self, pixel_values):
+        outputs = self.base_model(pixel_values=pixel_values)
+        logits = outputs.logits
+        return self.classifier(logits)
+
 
 class EfficientNet_b0(nn.Module):
     def __init__(self, num_classes=1, init_gain=0.02, intermediate_dim=64, add_intermediate_layer=True):

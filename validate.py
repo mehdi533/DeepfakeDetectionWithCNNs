@@ -7,7 +7,7 @@ from data import create_dataloader
 def validate(model, opt, __type):
 
     # Loading validation data
-    data_loader = create_dataloader(opt, __type)
+    data_loader = create_dataloader(opt, __type, 4)
 
     with torch.no_grad():
 
@@ -15,7 +15,10 @@ def validate(model, opt, __type):
 
         for img, label in data_loader:
 
-            in_tens = img.cuda()
+            try:
+                in_tens = img.cuda()
+            except:
+                in_tens = img
             y_pred.extend(model(in_tens).sigmoid().flatten().tolist())
             y_true.extend(label.flatten().tolist())
 

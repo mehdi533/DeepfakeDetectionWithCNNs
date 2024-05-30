@@ -21,19 +21,26 @@ def evaluation(model_path, name, opt):
     print("{} model testing on...".format(name))
 
     # ---------------------------------------------------------------------
-    list_models = ["StyleGAN", "VQGAN", "PNDM", "DDPM", "LDM", "DDIM", "ProGAN"]
+    list_models = ["FFpp1", "FFpp2", "FFpp3", "FFpp4", "StyleGAN", "VQGAN", "PNDM", "DDPM", "LDM", "DDIM", "ProGAN"]
     
     model = load_custom_model(opt.arch, opt.intermediate, opt.intermediate_dim)
         
     state_dict = torch.load(model_path, map_location='cpu')
     model.load_state_dict(state_dict['model'])
-    model.cuda()
-    model.eval()
+    try: 
+        model.cuda()
+        model.eval()
+    except:
+        model.eval()
     
     for v_id, test_model in enumerate(list_models):
             
         opt.no_resize = True    
-        opt.models = [test_model, "real"]
+
+        if "FFpp" in test_model:
+            opt.models = [test_model, "FFpp0"]
+        else: 
+            opt.models = [test_model, "real"]
         
         # returns: acc, ap, r_acc, f_acc, f1score, auc_score, prec, recall, y_true, y_pred
         acc, ap, r_acc, f_acc, f1, auc, prec, recall, _, _ = validate(model, opt, "test_list")
