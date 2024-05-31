@@ -3,8 +3,8 @@ import torch.nn as nn
 import torchvision.models as models
 from torchvision.models.vgg import VGG16_Weights
 from torchvision.models.efficientnet import EfficientNet_B0_Weights, EfficientNet_B4_Weights
-from torchvision.models.resnet import ResNet50_Weights
 from transformers import AutoModel, AutoConfig
+from transformers import BitImageProcessor, BitForImageClassification
 import timm
 
 
@@ -114,10 +114,6 @@ class HuggingModel(nn.Module):
         outs = self.lin_layer(pooled_features)
         return outs
     
-
-import torch
-import torch.nn as nn
-from transformers import BitImageProcessor, BitForImageClassification
 
 class BiTModel(nn.Module):
     def __init__(self, base_mod_name, num_classes=1, freeze_layers=None, additional_layers=False):

@@ -4,7 +4,8 @@ This script is used to test mutliple models at the same time, all in the same di
 
 import os
 from eval import evaluation
-from options.test_options import TestOptions
+# from options.test_options import TestOptions
+from options import Options
 from util import *
 
 def model_arch(dir):
@@ -14,7 +15,8 @@ def model_arch(dir):
 
 if __name__ == "__main__":
 
-    opt = TestOptions().parse(print_options=False)
+    opt = Options().parse(print_options=False)
+
     # eval_resnet50-DDPM-PNDM_bs256
     # /home/abdallah/code/checkpoints/resnet50/
     # resnet50_bs256_DDPM-PNDM/model_epoch_best.pth

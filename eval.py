@@ -7,7 +7,8 @@ from validate import validate
 from networks.custom_models import load_custom_model
 from deepfake_detector import Detector
 from data import create_dataloader
-from options.test_options import TestOptions
+# from options.test_options import TestOptions
+from options.base_options import BaseOptions
 
 results_dir = './results/'
 mkdir(results_dir)
@@ -87,6 +88,6 @@ def eval_multiple(path_list, opt):
 
 
 if __name__ == "__main__":
-    opt = TestOptions().parse(print_options=False)
+    opt = BaseOptions().parse(print_options=False)
     evaluation(opt.model_path, opt.filename, opt)
     # eval_multiple(["checkpoints/vgg16_inter#64_DDPM/model_epoch_best.pth", "checkpoints/vgg16_inter#64_PNDM/model_epoch_best.pth", "checkpoints/res50_inter#64_DDPM/model_epoch_best.pth", "checkpoints/efficient_inter#64_PNDM/model_epoch_best.pth", "checkpoints/efficient_inter#64_DDPM/model_epoch_best.pth"], opt)

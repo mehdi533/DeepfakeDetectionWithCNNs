@@ -7,7 +7,7 @@ from data import create_dataloader
 def validate(model, opt, __type):
 
     # Loading validation data
-    data_loader = create_dataloader(opt, __type, 4)
+    data_loader = create_dataloader(opt, __type)
 
     with torch.no_grad():
 

@@ -6,16 +6,19 @@ from validate import validate
 from data import create_dataloader
 from earlystop import EarlyStopping
 from networks.trainer import Trainer
-from options.train_options import TrainOptions
-from options.test_options import TestOptions
+from options.base_options import BaseOptions
+# from options.train_options import TrainOptions
+# from options.test_options import TestOptions
 
 
 if __name__ == '__main__':
 
-    opt = TrainOptions().parse()
+    opt = BaseOptions().parse()
+    opt.isTrain = True
 
-    val_opt = TestOptions().parse(print_options=False)
-
+    val_opt = BaseOptions().parse(print_options=False)
+    val_opt.isTrain = False
+    
     # Check what are the models to train on
     data_loader = create_dataloader(opt, "train_list")
 
