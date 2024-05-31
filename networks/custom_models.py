@@ -76,7 +76,7 @@ def load_custom_model(name: str, intermediate, intermediate_dim):
         model = BiTModel("google/bit-50")
         
     else:
-        raise ValueError("Model name should either be res50, vgg16, efficient_b0, or efficient_b4")
+        raise ValueError("Architecture name doesn't correspond, please check utils.py for available ones.")
     return model
 
 

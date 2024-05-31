@@ -48,10 +48,10 @@ class Options():
         # parser.add_argument('--cropSize', type=int, default=224, help='then crop to this size')
         # parser.add_argument('--filename', default='', help='filename to save')
 
-        # Options for testing
+        # --- Options for testing ---
 
-        # Path to model for single testing
-        parser.add_argument('--model_path', type=str)
+        # Path for testing
+        parser.add_argument('--path', type=str)
 
         # Path to folder containing all the models for multi testing
         parser.add_argument('--models_folder_path', type=str, default="./checkpoints")
@@ -61,14 +61,29 @@ class Options():
 
         return parser
 
+    def parse(self, print_options=True):
+
+        opt = self.gather_options()
+        
+        opt.isTrain = self.isTrain # Default = False
+
+        if print_options:
+            self.print_options(opt)
+
+        opt.models = opt.models.split(',')
+        mod = "-".join(map(str, opt.models[1:]))
+        # opt.filename = opt.arch+'_'+opt.name+'_'+ mod
+        
+        self.opt = opt
+        return self.opt
+    
     def gather_options(self):
-        # initialize parser with basic options
+
         if not self.initialized:
             parser = argparse.ArgumentParser(
                 formatter_class=argparse.ArgumentDefaultsHelpFormatter)
             parser = self.initialize(parser)
 
-        # get the basic options
         opt, _ = parser.parse_known_args()
         self.parser = parser
 
@@ -90,9 +105,6 @@ class Options():
         message += '----------------- End -------------------'
         print(message)
 
-        # save to the disk
-
-        # expr_dir = os.path.join(opt.checkpoints_dir, opt.name)
         mod = "-".join(map(str, opt.models.split(',')[1:]))
         expr_dir = os.path.join(opt.checkpoints_dir, opt.arch+'_'+opt.name+'_'+ mod)
 
@@ -102,44 +114,3 @@ class Options():
             opt_file.write(message)
             opt_file.write('\n')
 
-    def parse(self, print_options=True):
-
-        opt = self.gather_options()
-        opt.isTrain = self.isTrain   # train or test
-
-        # process opt.suffix
-        # if opt.suffix:
-        #     suffix = ('_' + opt.suffix.format(**vars(opt))) if opt.suffix != '' else ''
-        #     opt.name = opt.name + suffix
-
-        if print_options:
-            self.print_options(opt)
-
-        # set gpu ids
-        # str_ids = opt.gpu_ids.split(',')
-        # opt.gpu_ids = []
-        # for str_id in str_ids:
-        #     id = int(str_id)
-        #     if id >= 0:
-        #         opt.gpu_ids.append(id)
-        # if len(opt.gpu_ids) > 0:
-        #     torch.cuda.set_device(opt.gpu_ids[0])
-
-
-        # additional
-        # opt.classes = opt.classes.split(',')
-        # opt.rz_interp = opt.rz_interp.split(',')
-        # opt.blur_sig = [float(s) for s in opt.blur_sig.split(',')]
-        # opt.jpg_method = opt.jpg_method.split(',')
-        # opt.jpg_qual = [int(s) for s in opt.jpg_qual.split(',')]
-        # if len(opt.jpg_qual) == 2:
-        #     opt.jpg_qual = list(range(opt.jpg_qual[0], opt.jpg_qual[1] + 1))
-        # elif len(opt.jpg_qual) > 2:
-        #     raise ValueError("Shouldn't have more than 2 values for --jpg_qual.")
-        # ------------------------------------------------------------------------
-        opt.models = opt.models.split(',')
-        mod = "-".join(map(str, opt.models[1:]))
-        opt.filename = opt.arch+'_'+opt.name+'_'+ mod
-        # ------------------------------------------------------------------------
-        self.opt = opt
-        return self.opt

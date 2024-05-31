@@ -36,9 +36,10 @@ text = dict.fromkeys(test, '')
 
 # for filename in os.listdir(dir):
 
-filename = "/home/abdallah/Deepfake-Detection/results/bit_2905_ProGAN.csv"
-  # tmp = pd.read_csv(os.path.join(dir, filename),skiprows=1).set_index("testset")
+filename = "/home/abdallah/Deepfake-Detection/results/3105_swin_tiny_FFpp1-ProGAN.csv"
+# tmp = pd.read_csv(os.path.join(dir, filename),skiprows=1).set_index("testset")
 tmp = pd.read_csv(filename,skiprows=1).set_index("testset")
+
 tmp = tmp[["accuracy", "roc score", "avg precision", "precision"]]
 tmp.rename(columns={'accuracy': 'Accuracy', 'roc score': 'AUC', 'avg precision': 'Avg. precision', "precision": "Precision"}, inplace=True)
 for key in models.keys():
@@ -55,6 +56,7 @@ for key in models.keys():
       if model_test == "FFpp4":
         name = "NeuralTextures"
       text[model_test] += f"{name}         & {tmp['Accuracy'].loc[model_test]:.5f}          & {tmp['AUC'].loc[model_test]:.5f}         & {tmp['Avg. precision'].loc[model_test]:.5f}              & {tmp['Precision'].loc[model_test]:.5f}      \\\\ \hline\n"
+
 
 
 print(text["FFpp1"])

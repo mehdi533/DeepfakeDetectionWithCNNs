@@ -1,20 +1,19 @@
 import cv2
 import numpy as np
-import torchvision.datasets as datasets
-import torchvision.transforms as transforms
-import torchvision.transforms.functional as TF
-from random import random, choice
 from io import BytesIO
 from PIL import Image
 from PIL import ImageFile
-from scipy.ndimage.filters import gaussian_filter
+from random import random, choice
+
 import torch
+import torchvision.transforms as transforms
 from torch.utils.data import ConcatDataset
+
+from scipy.ndimage.filters import gaussian_filter
 
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 
-# Custom dataset class to load using metadata...
 class DatasetFromMetadata(torch.utils.data.Dataset):
     def __init__(self, data_list, transform=None):
         self.data_list = data_list  # List of (label, filename) tuples
@@ -24,10 +23,11 @@ class DatasetFromMetadata(torch.utils.data.Dataset):
         return len(self.data_list)
 
     def __getitem__(self, index):
-        # Get label and filename from the list
+
+        # Get label and filename from the list and load image
         label, image_path = self.data_list[index]
-        # Load image
-        image = Image.open(image_path).convert('RGB')  # Convert to RGB
+        image = Image.open(image_path).convert('RGB') 
+
         # Apply transformations if any
         if self.transform:
             image = self.transform(image)
@@ -35,9 +35,9 @@ class DatasetFromMetadata(torch.utils.data.Dataset):
         return image, torch.tensor(int(label))
 
 
-
 def get_dataset_metadata(opt, image_list):
-    # Define transformations if needed
+
+    # Basic resizing and normalization
     transform = transforms.Compose([
         transforms.Resize((224, 224)),
         transforms.ToTensor(),
@@ -46,11 +46,13 @@ def get_dataset_metadata(opt, image_list):
 
     dataset = DatasetFromMetadata(image_list, transform)
 
+    # Optional additional data (blurring)
     if opt.blurring:
         print("Blurring Active")
         transform_blur = transforms.Compose([transforms.Lambda(lambda img: blurring(img)), transform])
         dataset = ConcatDataset([dataset, DatasetFromMetadata(image_list, transform_blur)])
     
+    # Optional additional data (compression)
     if opt.compression:
         print("Compression Active")
         transform_comp = transforms.Compose([transforms.Lambda(lambda img: compressing(img)), transform])
@@ -58,6 +60,7 @@ def get_dataset_metadata(opt, image_list):
 
     return dataset
 
+# Functions for augmentation (compression and blurring)
 
 def compressing(img, jpg_method='cv2', jpg_qual=75):
     img = np.array(img)
@@ -120,16 +123,8 @@ def pil_jpg(img, compress_val):
 
 
 jpeg_dict = {'cv2': cv2_jpg, 'pil': pil_jpg}
+
+
 def jpeg_from_key(img, compress_val, key):
     method = jpeg_dict[key]
     return method(img, compress_val)
-
-
-# rz_dict = {'bilinear': Image.BILINEAR,
-#            'bicubic': Image.BICUBIC,
-#            'lanczos': Image.LANCZOS,
-#            'nearest': Image.NEAREST}
-
-# def custom_resize(img, rz_interp='bilinear', loadSize=256):
-#     interp = sample_discrete(rz_interp)
-#     return TF.resize(img, loadSize, interpolation=rz_dict[interp])

@@ -2,6 +2,8 @@
 This script is used to test mutliple models at the same time, all in the same dir
 """
 
+#### OBSOLETE
+
 import os
 from eval import evaluation
 # from options.test_options import TestOptions
