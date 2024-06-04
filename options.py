@@ -18,6 +18,8 @@ class Options():
         # Architecture options: add a layer before the last one (arXiv:2302.10174v1)
         parser.add_argument('--intermediate', action=argparse.BooleanOptionalAction, type=bool, default=False, help='filename to save')
         parser.add_argument('--intermediate_dim', type=int, default=64, help='Size of the intermediate dimension')
+        parser.add_argument("--freeze", action=argparse.BooleanOptionalAction, type=bool, default=False, help='freeze all layers except classifier')
+        parser.add_argument("--pre_trained", action=argparse.BooleanOptionalAction, type=bool, default=True, help='load pre trained weights')
 
         # Models that should be trained on (e.g: FFpp0,FFpp1 or real,ProGAN...)
         parser.add_argument('--models', default='real', help='models to take into account')
@@ -71,8 +73,15 @@ class Options():
             self.print_options(opt)
 
         opt.models = opt.models.split(',')
-        mod = "-".join(map(str, opt.models[1:]))
-        # opt.filename = opt.arch+'_'+opt.name+'_'+ mod
+        
+        tmp_models = []
+        for m in opt.models:
+            if m == "real" or m == "FFpp0":
+                continue
+            tmp_models.append(m)
+            
+        mod = "-".join(map(str, tmp_models))
+        opt.filename = opt.arch+'_'+opt.name+'_'+ mod
         
         self.opt = opt
         return self.opt

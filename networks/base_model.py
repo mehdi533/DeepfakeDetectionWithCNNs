@@ -10,7 +10,11 @@ class BaseModel(nn.Module):
         self.total_steps = 0
         self.isTrain = opt.isTrain
         self.save_dir = os.path.join(opt.checkpoints_dir, opt.filename)
-        self.device = torch.device('cuda')
+        
+        if torch.cuda.is_available():
+            self.device = torch.device('cuda')
+        else:
+            self.device = torch.device('cpu')
 
     # Load models from the disk, used for validation and testing
     def load_networks(self, epoch):

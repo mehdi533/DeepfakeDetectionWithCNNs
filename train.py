@@ -55,7 +55,6 @@ if __name__ == '__main__':
             epoch_iter += opt.batch_size
 
             model.set_input(data)
-
             model.optimize_parameters()
             
             # Tensorboard display

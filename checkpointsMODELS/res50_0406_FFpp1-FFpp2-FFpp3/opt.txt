@@ -1,0 +1,21 @@
+----------------- Options ---------------
+                     arch: res50                         
+               batch_size: 256                           	[default: 64]
+                 blurring: 0                             
+          checkpoints_dir: ./checkpointsMODELS           
+              compression: 0                             
+                 dataroot: ./dataset/                    
+                   freeze: False                         
+             intermediate: False                         
+         intermediate_dim: 64                            
+                  isTrain: False                         	[default: None]
+                 metadata: ./dataset/Metadata/           
+                   models: FFpp0,FFpp1,FFpp2,FFpp3       	[default: real]
+       models_folder_path: ./checkpoints                 
+            multiply_real: 3                             	[default: 1]
+                     name: 0406                          	[default: experiment_name]
+              num_threads: 1                             
+                     path: None                          
+              pre_trained: True                          
+Date of start: 2024-06-04 09:40:53.286651
+----------------- End -------------------

@@ -5,6 +5,68 @@ import torch
 from networks.custom_models import load_custom_model
 from util import models_names
 
+from sklearn.linear_model import LinearRegression
+
+
+def train_meta_model(base_model_predictions, true_labels):
+    """
+    Train a linear regression model to combine base model predictions.
+    
+    Args:
+    base_model_predictions (np.array): An array of shape (num_samples, num_models) containing the predictions of each model.
+    true_labels (np.array): The true labels for the samples.
+    
+    Returns:
+    LinearRegression: The trained linear regression model.
+    """
+    # The input X is already in the required shape (num_samples, num_models)
+    X = base_model_predictions
+    
+    # Train a linear regression model
+    model = LinearRegression()
+    model.fit(X, true_labels)
+
+    coefficients = model.coef_
+    
+    return model, coefficients
+    
+
+def linear_regression_prediction(base_model_predictions, true_labels):
+    """
+    Combine predictions using a trained linear regression model.
+    
+    Args:
+    base_model_predictions (np.array): An array of shape (num_samples, num_models) containing the predictions of each model.
+    true_labels (np.array): The true labels for the samples.
+    
+    Returns:
+    np.array: An array containing the final class probabilities.
+    """
+    # Train the meta-model
+    meta_model, coefficients = train_meta_model(base_model_predictions, true_labels)
+
+    # The input X is already in the required shape (num_samples, num_models)
+    X = base_model_predictions
+    
+    # Predict using the meta-model
+    combined_predictions = meta_model.predict(X)
+
+    print("Coefficients for each model's prediction:", coefficients)
+    
+    return combined_predictions
+
+def weighted_averaging(predictions_array, weights):
+    # Ensure the weights array is the same length as the number of prediction rows minus the true labels
+    assert len(weights) == predictions_array.shape[0] - 1
+    # Exclude the first row which contains the true labels
+    weighted_preds = np.average(predictions_array[1:], axis=0, weights=weights)
+    return weighted_preds
+
+def simple_averaging(predictions_array):
+    # Exclude the first row which contains the true labels
+    combined_preds = np.mean(predictions_array[1:], axis=0)
+    return combined_preds
+
 
 def voting_prediction(list_of_predictions):
     """
@@ -73,14 +135,16 @@ class Voting():
                         in_tens = img.cuda()
                     except:
                         in_tens = img
-                        
+                    
+                    # Is it better to use sigmoid or softmax?
                     y_pred_temp.extend(np.array(net(in_tens).sigmoid().flatten().tolist()))
 
                 # Adds the prediction of the model to the array of predictions
+                # Format: [[preds_model1], [preds_model2], ...]
                 y_pred_array.append(np.array(y_pred_temp))
 
         y_true = np.array(y_true)
-        y_pred = voting_prediction(np.array(y_pred_array))
+        y_pred = linear_regression_prediction(np.array(y_pred_array).T, y_true)
 
         return y_true, y_pred
     

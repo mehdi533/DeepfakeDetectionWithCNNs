@@ -4,6 +4,7 @@ import torchvision.models as models
 from torchvision.models.vgg import VGG16_Weights
 from torchvision.models.efficientnet import EfficientNet_B0_Weights, EfficientNet_B4_Weights
 from transformers import AutoModel, AutoConfig
+from transformers import Blip2Processor, Blip2VisionModel
 from transformers import BitImageProcessor, BitForImageClassification
 import timm
 
@@ -27,12 +28,12 @@ class CustomHead(nn.Module):
         return x
             
             
-def load_custom_model(name: str, intermediate, intermediate_dim):
+def load_custom_model(name: str, intermediate, intermediate_dim, freeze, pre_trained):
 
     model = None
 
     if name == 'res50':
-        model = ResNet50(add_intermediate_layer = intermediate, intermediate_dim=intermediate_dim)
+        model = ResNet50(add_intermediate_layer=intermediate, intermediate_dim=intermediate_dim, freezed=freeze, pre_trained=pre_trained)
     elif name == 'vgg16':
         model = VGG16(add_intermediate_layer = intermediate, intermediate_dim=intermediate_dim)
     elif name == 'efficient_b0':
@@ -74,10 +75,31 @@ def load_custom_model(name: str, intermediate, intermediate_dim):
 
     elif name == "bit":
         model = BiTModel("google/bit-50")
-        
+    
+    elif name == "imagegpt_small":
+        model = HuggingModel(base_mod_name='openai/imagegpt-small')
+    
+    elif name == "blip2":
+        # Load the processor and model
+        # processor = Blip2Processor.from_pretrained("Salesforce/blip2-opt-2.7b")
+        model = Blip2VisionModel.from_pretrained("Salesforce/blip2-opt-2.7b")
+        model = Blip2VisionForImageClassification(model)
     else:
         raise ValueError("Architecture name doesn't correspond, please check utils.py for available ones.")
     return model
+
+
+class Blip2VisionForImageClassification(nn.Module):
+    def __init__(self, base_model, num_classes=1):
+        super(Blip2VisionForImageClassification, self).__init__()
+        self.base_model = base_model
+        self.classifier = nn.Linear(base_model.config.hidden_size, num_classes)
+        
+    def forward(self, pixel_values):
+        outputs = self.base_model(pixel_values=pixel_values)
+        pooled_output = outputs.last_hidden_state[:, 0]  # Use the CLS token
+        logits = self.classifier(pooled_output)
+        return logits
 
 
 class HuggingModel(nn.Module):
@@ -209,10 +231,20 @@ class EfficientNet_b4(nn.Module):
 
 
 class VGG16(nn.Module):
-    def __init__(self, num_classes=1, init_gain=0.02, intermediate_dim=64, add_intermediate_layer=True):
+    def __init__(self, num_classes=1, init_gain=0.02, intermediate_dim=128, add_intermediate_layer=False, freezed=False, pre_trained=True):
         super(VGG16, self).__init__()
         
-        self.model = models.vgg16(weights=VGG16_Weights.DEFAULT)
+        if pre_trained:
+            # Load pre-trained model
+            self.model = models.vgg16(weights=VGG16_Weights.DEFAULT)
+        else:
+            # Load empty (initialized) model
+            self.model = models.resnet50(weights=None) # Random initialization
+
+        # Freeze all layers except last one
+        if freezed:
+            for param in self.model.parameters():
+                param.requires_grad = False
 
         num_ftrs = self.model.classifier[6].in_features
         
@@ -221,8 +253,8 @@ class VGG16(nn.Module):
             
             self.model.classifier[6] = nn.Sequential(
                 self.intermediate_layer,
-                nn.ReLU(inplace=True),  # Add ReLU activation if needed
-                nn.Linear(intermediate_dim, num_classes)  # Output layer
+                nn.ReLU(inplace=True), 
+                nn.Linear(intermediate_dim, num_classes)  # Output layer kNN voting
             )
             
             torch.nn.init.normal_(self.intermediate_layer.weight.data, 0.0, init_gain)
@@ -236,33 +268,33 @@ class VGG16(nn.Module):
     
 
 class ResNet50(nn.Module):
-    def __init__(self, num_classes=1, init_gain=0.02, intermediate_dim=64, add_intermediate_layer=True):
+    def __init__(self, num_classes=1, init_gain=0.02, intermediate_dim=128, add_intermediate_layer=False, freezed=False, pre_trained=True):
         super(ResNet50, self).__init__()
         
-        # Load pre-trained ResNet50 model
-        # self.model = models.resnet50(weights=ResNet50_Weights.DEFAULT)
-        self.model = models.resnet50(weights=None)
+        if pre_trained:
+            # Load pre-trained model
+            self.model = models.resnet50(weights=models.ResNet50_Weights.DEFAULT)
+        else:
+            # Load empty (initialized) model
+            self.model = models.resnet50(weights=None) # Random initialization
 
-        # Get the number of input features for the final fully connected layer
+        # Freeze all layers except last one
+        if freezed:
+            for param in self.model.parameters():
+                param.requires_grad = False
+
         num_ftrs = self.model.fc.in_features
         
-        # Define the intermediate layer if requested
         if add_intermediate_layer:
             self.intermediate_layer = nn.Linear(num_ftrs, intermediate_dim)
-            
-            # Replace the final fully connected layer with a sequence of layers
-            # containing the intermediate layer and the final output layer
             self.model.fc = nn.Sequential(
                 self.intermediate_layer,
-                nn.ReLU(inplace=True),  # Add ReLU activation if needed
-                nn.Linear(intermediate_dim, num_classes)  # Output layer
+                nn.ReLU(inplace=True),
+                nn.Linear(intermediate_dim, num_classes)  # Output layer / Voting with kNN
             )
-            
-            # Initialize the weights of the new layers
             torch.nn.init.normal_(self.intermediate_layer.weight.data, 0.0, init_gain)
             torch.nn.init.normal_(self.model.fc[2].weight.data, 0.0, init_gain)
         else:
-            # If not adding the intermediate layer, replace the final fully connected layer directly
             self.model.fc = nn.Linear(num_ftrs, num_classes)
             torch.nn.init.normal_(self.model.fc.weight.data, 0.0, init_gain)
 

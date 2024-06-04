@@ -14,7 +14,7 @@ class Trainer(BaseModel):
 
         if self.isTrain:
             # Calls function to load the model with corresponding architecture
-            self.model = load_custom_model(opt.arch, opt.intermediate, opt.intermediate_dim)
+            self.model = load_custom_model(opt.arch, opt.intermediate, opt.intermediate_dim, opt.freeze, opt.pre_trained)
 
         if self.isTrain:
             self.loss_fn = nn.BCEWithLogitsLoss()
