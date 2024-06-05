@@ -24,7 +24,7 @@ def evaluation(model_path, exp_name, opt):
     for present_data in list_data:
         if present_data in model_path:
             list_present.append(present_data)
-
+            
     name = exp_name + '_' + arch + "-" + '-'.join(list_present)
 
     rows = [["{} model testing on...".format(model_path.split("/")[-2])],
@@ -32,7 +32,7 @@ def evaluation(model_path, exp_name, opt):
 
     print("{} model testing on...".format(name))
     
-    model = load_custom_model(arch, opt.intermediate, opt.intermediate_dim)
+    model = load_custom_model(arch, opt.intermediate, opt.intermediate_dim, opt.freeze, opt.pre_trained)
         
     state_dict = torch.load(model_path, map_location='cpu')
     model.load_state_dict(state_dict['model'])

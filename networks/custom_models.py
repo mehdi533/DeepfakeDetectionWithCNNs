@@ -32,18 +32,30 @@ def load_custom_model(name: str, intermediate, intermediate_dim, freeze, pre_tra
 
     model = None
 
+    # Empty, fine-tune, freeze
     if name == 'res50':
         model = ResNet50(add_intermediate_layer=intermediate, intermediate_dim=intermediate_dim, freezed=freeze, pre_trained=pre_trained)
+    
+    # Empty, fine-tune, freeze (Comparison with other models)
     elif name == 'vgg16':
-        model = VGG16(add_intermediate_layer = intermediate, intermediate_dim=intermediate_dim)
+        model = VGG16(add_intermediate_layer=intermediate, intermediate_dim=intermediate_dim, freezed=freeze, pre_trained=pre_trained)
+    
+    # Empty, fine-tune, freeze (Comparison with other models)
     elif name == 'efficient_b0':
-        model = EfficientNet_b0(add_intermediate_layer = intermediate, intermediate_dim=intermediate_dim)
+        model = EfficientNet_b0(add_intermediate_layer=intermediate, intermediate_dim=intermediate_dim, freezed=freeze, pre_trained=pre_trained)
+
+    # Empty, fine-tune, freeze (Comparison with other models)
     elif name == 'efficient_b4':
-        model = EfficientNet_b4(add_intermediate_layer = intermediate, intermediate_dim=intermediate_dim)
+        model = EfficientNet_b4(add_intermediate_layer=intermediate, intermediate_dim=intermediate_dim, freezed=freeze, pre_trained=pre_trained)
+    
+    # Forensics++, Voting, ... Best model so far so used multiple times and compared to all the others
     elif name == 'swin_tiny':
         model = HuggingModel("microsoft/swin-tiny-patch4-window7-224") #["base_model.encoder.layers.3.blocks.1"]
+
     elif name == 'swin_base':
         model = HuggingModel("microsoft/swin-base-patch4-window7-224")
+
+    # A bit too big so not used as much... Overfits a lot.
     elif name == 'swin_large':
         model = HuggingModel("microsoft/swinv2-large-patch4-window12to16-192to256-22kto1k-ft")
     elif name == "coatnet":
@@ -174,24 +186,32 @@ class BiTModel(nn.Module):
         logits = outputs.logits
         return self.classifier(logits)
 
-
+# Empty, fine tune, freeze
 class EfficientNet_b0(nn.Module):
-    def __init__(self, num_classes=1, init_gain=0.02, intermediate_dim=64, add_intermediate_layer=True):
+    def __init__(self, num_classes=1, init_gain=0.02, intermediate_dim=64, add_intermediate_layer=False, freezed=False, pre_trained=True):
         super(EfficientNet_b0, self).__init__()
-    
-        self.model = models.efficientnet_b0(weights=EfficientNet_B0_Weights.DEFAULT)
+
+        if pre_trained:
+            # Load pre-trained model
+            self.model = models.efficientnet_b0(weights=EfficientNet_B0_Weights.DEFAULT)
+        else:
+            # Load empty (initialized) model
+            self.model = models.efficientnet_b0(weights=None) # Random initialization
+
+        # Freeze all layers except last one
+        if freezed:
+            for param in self.model.parameters():
+                param.requires_grad = False
 
         num_ftrs = self.model.classifier[1].in_features
 
         if add_intermediate_layer:
             self.intermediate_layer = nn.Linear(num_ftrs, intermediate_dim)
-            
             self.model.classifier[1] = nn.Sequential(
                 self.intermediate_layer,
-                nn.ReLU(inplace=True),  # Add ReLU activation if needed
-                nn.Linear(intermediate_dim, num_classes)  # Output layer
+                nn.ReLU(inplace=True),
+                nn.Linear(intermediate_dim, num_classes)  # Output layer kNN voting
             )
-            
             torch.nn.init.normal_(self.intermediate_layer.weight.data, 0.0, init_gain)
             torch.nn.init.normal_(self.model.classifier[1][2].weight.data, 0.0, init_gain)
         else:
@@ -201,25 +221,32 @@ class EfficientNet_b0(nn.Module):
     def forward(self, x):
         return self.model(x)
     
-
+# Empty, fine tune, freeze
 class EfficientNet_b4(nn.Module):
-    def __init__(self, num_classes=1, init_gain=0.02, intermediate_dim=64, add_intermediate_layer=False):
+    def __init__(self, num_classes=1, init_gain=0.02, intermediate_dim=64, add_intermediate_layer=False, freezed=False, pre_trained=True):
         super(EfficientNet_b4, self).__init__()
-    
-        self.model = models.efficientnet_b4(weights=EfficientNet_B4_Weights.DEFAULT)
+
+        if pre_trained:
+            # Load pre-trained model
+            self.model = models.efficientnet_b4(weights=EfficientNet_B4_Weights.DEFAULT)
+        else:
+            # Load empty (initialized) model
+            self.model = models.efficientnet_b4(weights=None) # Random initialization
+
+        # Freeze all layers except last one
+        if freezed:
+            for param in self.model.parameters():
+                param.requires_grad = False
 
         num_ftrs = self.model.classifier[1].in_features
 
         if add_intermediate_layer:
-            print("Adding intermediate layer...")
             self.intermediate_layer = nn.Linear(num_ftrs, intermediate_dim)
-            
             self.model.classifier[1] = nn.Sequential(
                 self.intermediate_layer,
-                nn.ReLU(inplace=True),  # Add ReLU activation if needed
-                nn.Linear(intermediate_dim, num_classes)  # Output layer
+                nn.ReLU(inplace=True),
+                nn.Linear(intermediate_dim, num_classes)  # Output layer kNN voting
             )
-            
             torch.nn.init.normal_(self.intermediate_layer.weight.data, 0.0, init_gain)
             torch.nn.init.normal_(self.model.classifier[1][2].weight.data, 0.0, init_gain)
         else:
@@ -229,9 +256,9 @@ class EfficientNet_b4(nn.Module):
     def forward(self, x):
         return self.model(x)
 
-
+# Empty, fine tune, freeze
 class VGG16(nn.Module):
-    def __init__(self, num_classes=1, init_gain=0.02, intermediate_dim=128, add_intermediate_layer=False, freezed=False, pre_trained=True):
+    def __init__(self, num_classes=1, init_gain=0.02, intermediate_dim=64, add_intermediate_layer=False, freezed=False, pre_trained=True):
         super(VGG16, self).__init__()
         
         if pre_trained:
@@ -239,7 +266,7 @@ class VGG16(nn.Module):
             self.model = models.vgg16(weights=VGG16_Weights.DEFAULT)
         else:
             # Load empty (initialized) model
-            self.model = models.resnet50(weights=None) # Random initialization
+            self.model = models.vgg16(weights=None) # Random initialization
 
         # Freeze all layers except last one
         if freezed:
@@ -250,13 +277,11 @@ class VGG16(nn.Module):
         
         if add_intermediate_layer:
             self.intermediate_layer = nn.Linear(num_ftrs, intermediate_dim)
-            
             self.model.classifier[6] = nn.Sequential(
                 self.intermediate_layer,
                 nn.ReLU(inplace=True), 
                 nn.Linear(intermediate_dim, num_classes)  # Output layer kNN voting
             )
-            
             torch.nn.init.normal_(self.intermediate_layer.weight.data, 0.0, init_gain)
             torch.nn.init.normal_(self.model.classifier[6][2].weight.data, 0.0, init_gain)
         else:
@@ -266,9 +291,9 @@ class VGG16(nn.Module):
     def forward(self, x):
         return self.model(x)
     
-
+# Empty, fine tune, freeze
 class ResNet50(nn.Module):
-    def __init__(self, num_classes=1, init_gain=0.02, intermediate_dim=128, add_intermediate_layer=False, freezed=False, pre_trained=True):
+    def __init__(self, num_classes=1, init_gain=0.02, intermediate_dim=64, add_intermediate_layer=False, freezed=False, pre_trained=True):
         super(ResNet50, self).__init__()
         
         if pre_trained:
