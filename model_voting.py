@@ -4,56 +4,29 @@ import torch
 
 from networks.custom_models import load_custom_model
 from util import models_names
+from data import create_dataloader
 
 from sklearn.linear_model import LinearRegression
 
+import pandas as pd
 
-def train_meta_model(base_model_predictions, true_labels):
-    """
-    Train a linear regression model to combine base model predictions.
-    
-    Args:
-    base_model_predictions (np.array): An array of shape (num_samples, num_models) containing the predictions of each model.
-    true_labels (np.array): The true labels for the samples.
-    
-    Returns:
-    LinearRegression: The trained linear regression model.
-    """
-    # The input X is already in the required shape (num_samples, num_models)
-    X = base_model_predictions
-    
-    # Train a linear regression model
-    model = LinearRegression()
-    model.fit(X, true_labels)
+def train_meta_model(base_model_predictions, y_val):
+    meta_features = np.vstack(base_model_predictions).T
+    meta_model = LinearRegression().fit(meta_features, y_val)
 
-    coefficients = model.coef_
-    
-    return model, coefficients
-    
+    # meta_features_df = pd.DataFrame(meta_features, columns=['Model1_Pred', 'Model2_Pred', 'Model3_Pred'])
+    # meta_features_df['True_Label'] = y_val
+    # meta_features_df.to_csv('results/meta_features.csv', index=False)
 
-def linear_regression_prediction(base_model_predictions, true_labels):
-    """
-    Combine predictions using a trained linear regression model.
-    
-    Args:
-    base_model_predictions (np.array): An array of shape (num_samples, num_models) containing the predictions of each model.
-    true_labels (np.array): The true labels for the samples.
-    
-    Returns:
-    np.array: An array containing the final class probabilities.
-    """
-    # Train the meta-model
-    meta_model, coefficients = train_meta_model(base_model_predictions, true_labels)
 
-    # The input X is already in the required shape (num_samples, num_models)
-    X = base_model_predictions
-    
-    # Predict using the meta-model
-    combined_predictions = meta_model.predict(X)
+    return meta_model
 
-    print("Coefficients for each model's prediction:", coefficients)
-    
-    return combined_predictions
+
+def predict_with_meta_model(base_model_predictions, meta_model):
+    meta_features = np.vstack(base_model_predictions).T
+    meta_predictions = meta_model.predict(meta_features)
+    return meta_predictions
+
 
 def weighted_averaging(predictions_array, weights):
     # Ensure the weights array is the same length as the number of prediction rows minus the true labels
@@ -69,12 +42,7 @@ def simple_averaging(predictions_array):
 
 
 def voting_prediction(list_of_predictions):
-    """
-    In this function is defined the how each model influences the attributed class of the image.
-    Related work: 
-    """
 
-    # Transposing the array
     list_of_predictions = list_of_predictions.T
 
     image_score = []
@@ -89,7 +57,7 @@ def voting_prediction(list_of_predictions):
 
 class Voting():
 
-    def __init__(self, list_path_models: str):
+    def __init__(self, list_path_models: str, opt):
         
         # Default GPU (izar) or CPU (helvetios)
         self.device = torch.device('cuda:0') if torch.cuda.is_available() else torch.device('cpu')
@@ -105,7 +73,7 @@ class Voting():
                     arch = possible_arch
                     break
 
-            net = load_custom_model(arch, intermediate=False, intermediate_dim=0)
+            net = load_custom_model(arch, opt.intermediate, opt.intermediate_dim, opt.freeze, opt.pre_trained)
             state_dict = torch.load(os.path.join(list_path_models, model_path, "model_epoch_best.pth"), map_location='cpu')
             net.load_state_dict(state_dict['model'])
 
@@ -115,6 +83,39 @@ class Voting():
                 net.eval()
 
             self.nets += [net]
+        
+        if opt.meta_model:
+            
+            data_loader_val = create_dataloader(opt, "val_list")
+
+            y_true, y_pred_array = [], []
+
+            with torch.no_grad():    
+                
+                for net_idx, net in enumerate(self.nets):
+                    y_pred_temp = []
+
+                    for img, label in data_loader_val:
+                        
+                        # Only need y_true once
+                        if net_idx == 0:
+                            y_true.extend(label.flatten().tolist())
+
+                        try:
+                            in_tens = img.cuda()
+                        except:
+                            in_tens = img
+                        
+                        # Is it better to use sigmoid or softmax?
+                        y_pred_temp.extend(np.array(net(in_tens).sigmoid().flatten().tolist()))
+
+                    # Adds the prediction of the model to the array of predictions
+                    # Format: [[preds_model1], [preds_model2], ...]
+                    y_pred_array.append(np.array(y_pred_temp))
+            
+            print("Training meta model...")
+            self.meta_model = train_meta_model(y_pred_array, y_true)
+
 
     def synth_real_detector(self, data_loader):
         
@@ -144,7 +145,7 @@ class Voting():
                 y_pred_array.append(np.array(y_pred_temp))
 
         y_true = np.array(y_true)
-        y_pred = linear_regression_prediction(np.array(y_pred_array).T, y_true)
+        y_pred = predict_with_meta_model(y_pred_array, self.meta_model)
 
         return y_true, y_pred
     

@@ -41,6 +41,8 @@ class Options():
         # Options for data augmentation
         parser.add_argument('--compression', type=int, default=0)
         parser.add_argument('--blurring', type=int, default=0)
+        parser.add_argument('--compr_prob', type=float, default=0.0)
+        parser.add_argument('--blur_prob', type=float, default=0.0)
 
         # Name of the experiment, results save in: checkpoints_dir, filename will be <arch>_<name>_<models>
         parser.add_argument('--name', type=str, default='experiment_name', help='name of the experiment. It decides where to store samples and models')
@@ -57,6 +59,9 @@ class Options():
 
         # Path to folder containing all the models for multi testing
         parser.add_argument('--models_folder_path', type=str, default="./checkpoints")
+
+        # Meta model for evaluation from multiple models
+        parser.add_argument("--meta_model", action=argparse.BooleanOptionalAction, type=bool, default=False, help='meta model?')
 
         self.isTrain = False
         self.initialized = True

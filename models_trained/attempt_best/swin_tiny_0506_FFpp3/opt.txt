@@ -1,0 +1,21 @@
+----------------- Options ---------------
+                     arch: swin_tiny                     	[default: res50]
+               batch_size: 256                           	[default: 64]
+                 blurring: 0                             
+          checkpoints_dir: ./checkpointsMODELS           
+              compression: 0                             
+                 dataroot: ./dataset/                    
+                   freeze: False                         
+             intermediate: False                         
+         intermediate_dim: 64                            
+                  isTrain: False                         	[default: None]
+                 metadata: ./dataset/Metadata/           
+                   models: FFpp0,FFpp3                   	[default: real]
+       models_folder_path: ./checkpoints                 
+            multiply_real: 1                             
+                     name: 0506                          	[default: experiment_name]
+              num_threads: 1                             
+                     path: None                          
+              pre_trained: True                          
+Date of start: 2024-06-06 05:10:26.667639
+----------------- End -------------------

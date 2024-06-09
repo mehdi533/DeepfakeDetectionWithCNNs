@@ -21,7 +21,11 @@ models = {"efficient_b0":"Efficient b0",\
 "bit": "BiT",\
 "vit_base": "ViT Base",\
 "vit_large": "ViT Large",\
-"deit_base": "DeiT Base"}
+"deit_base": "DeiT Base",\
+"beit": "BeiT",\
+"convnext": "ConvNext",\
+"regnet": "RegNet",\
+"swin": "Swin"}
 
 import pandas as pd
 import os
@@ -36,28 +40,32 @@ text = dict.fromkeys(test, '')
 
 # for filename in os.listdir(dir):
 
-filename = "/home/abdallah/Deepfake-Detection/models_trained/swin_tiny_Forensics/swin_tiny_0106_FFpp2/0406_swin_tiny-FFpp2.csv"
+filename = "/home/abdallah/Deepfake-Detection/results/SWINmetamodel0806_swin-FFpp3_swin-ProGAN.csv"
+
 # tmp = pd.read_csv(os.path.join(dir, filename),skiprows=1).set_index("testset")
 tmp = pd.read_csv(filename,skiprows=1).set_index("testset")
 
 tmp = tmp[["accuracy", "roc score", "avg precision", "precision"]]
 tmp.rename(columns={'accuracy': 'Accuracy', 'roc score': 'AUC', 'avg precision': 'Avg. precision', "precision": "Precision"}, inplace=True)
-for key in models.keys():
-  if key in filename:
-    for model_test in test:
-      if "FFpp" not in model_test:
-        name = model_test
-      if model_test == "FFpp1":
-        name = "Deepfakes"
-      if model_test == "FFpp2":
-        name = "Face2Face"
-      if model_test == "FFpp3":
-        name = "FaceSwap"
-      if model_test == "FFpp4":
-        name = "NeuralTextures"
-      # text[model_test] += f"{name}         & {tmp['Accuracy'].loc[model_test]:.5f}          & {tmp['AUC'].loc[model_test]:.5f}         & {tmp['Avg. precision'].loc[model_test]:.5f}              & {tmp['Precision'].loc[model_test]:.5f}      \\\\ \hline\n"
-      text[model_test] += f"{tmp['Avg. precision'].loc[model_test]:.5f} / {tmp['AUC'].loc[model_test]:.5f}"
-      # AP / AUC & AP / AUC & AP / AUC
+tmp = tmp.round(5)
+print(tmp)
+
+# for key in models.keys():
+
+for model_test in test:
+  if "FFpp" not in model_test:
+    name = model_test
+  if model_test == "FFpp1":
+    name = "Deepfakes"
+  if model_test == "FFpp2":
+    name = "Face2Face"
+  if model_test == "FFpp3":
+    name = "FaceSwap"
+  if model_test == "FFpp4":
+    name = "NeuralTextures"
+  # text[model_test] += f"{name}         & {tmp['Accuracy'].loc[model_test]:.5f}          & {tmp['AUC'].loc[model_test]:.5f}         & {tmp['Avg. precision'].loc[model_test]:.5f}              & {tmp['Precision'].loc[model_test]:.5f}      \\\\ \hline\n"
+  text[model_test] += f"{tmp['Avg. precision'].loc[model_test]*100:.2f} / {tmp['AUC'].loc[model_test]*100:.2f}"
+    # AP / AUC & AP / AUC & AP / AUC
 
 GANS = text["VQGAN"] + " & " + text["StyleGAN"] + " & " + text["VQGAN"]
 DMs = text["DDIM"] + " & " + text["DDPM"] + " & " + text["PNDM"] + " & " +  text["LDM"]

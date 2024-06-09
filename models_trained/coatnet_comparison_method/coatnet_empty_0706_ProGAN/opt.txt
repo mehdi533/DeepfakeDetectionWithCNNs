@@ -1,0 +1,21 @@
+----------------- Options ---------------
+                     arch: coatnet                       	[default: res50]
+               batch_size: 32                            	[default: 64]
+                 blurring: 0                             
+          checkpoints_dir: ../../../scratch/izar/abdallah/COATNET/	[default: ./checkpointsMODELS]
+              compression: 0                             
+                 dataroot: ./dataset/                    
+                   freeze: False                         
+             intermediate: False                         
+         intermediate_dim: 64                            
+                  isTrain: False                         	[default: None]
+                 metadata: ./dataset/Metadata/           
+                   models: real,ProGAN                   	[default: real]
+       models_folder_path: ./checkpoints                 
+            multiply_real: 1                             
+                     name: empty_0706                    	[default: experiment_name]
+              num_threads: 1                             
+                     path: None                          
+              pre_trained: False                         	[default: True]
+Date of start: 2024-06-07 08:35:23.177444
+----------------- End -------------------

@@ -86,7 +86,7 @@ def eval_voting(path_list, exp_name, opt):
 
     print("{} testing on...".format(name))
 
-    detector = Voting(path_list)
+    detector = Voting(path_list, opt)
 
     for test_model in list_data:
 
