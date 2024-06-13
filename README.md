@@ -1,8 +1,8 @@
 # Exploring Diffusion-Generated Image Detection Methods
 
-Research done by: Mehdi Abdallahi\n
-Supervisor: Yuhang Lu\n
-Professor: Dr. Touradj Ebrahimi
+Research done by: Mehdi Abdallahi
+<br>Supervisor: Yuhang Lu
+<br>Professor: Dr. Touradj Ebrahimi
 
 ---
 This repository contains models, evaluation code, training and visualization code from this [report](https://github.com/aristo6253/diffusion-image-detection/blob/main/report.pdf) and [presentation](https://github.com/aristo6253/diffusion-image-detection/blob/main/presentation.pdf). The model architecture is based on the [Wang et al.](https://arxiv.org/pdf/1912.11035.pdf) paper and its code can be found in this [github](https://github.com/peterwang512/CNNDetection).
