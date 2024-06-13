@@ -5,35 +5,66 @@ Research done by: Mehdi Abdallahi
 <br>Professor: Dr. Touradj Ebrahimi
 
 ---
-This repository contains models, evaluation code, training and visualization code from this [report](https://github.com/aristo6253/diffusion-image-detection/blob/main/report.pdf) and [presentation](https://github.com/aristo6253/diffusion-image-detection/blob/main/presentation.pdf). The model architecture is based on the [Wang et al.](https://arxiv.org/pdf/1912.11035.pdf) paper and its code can be found in this [github](https://github.com/peterwang512/CNNDetection).
+
+The content of this repository was used for the research done during the second semester of my Master's on the detection of diffusion-generated images, the code is adapted from the paper [CNN-generated images are surprisingly easy to spot... for now](https://arxiv.org/pdf/1912.11035.pdf) published by Wang et al. in 2020, and the code they used can be found in this [repository](https://github.com/peterwang512/CNNDetection). The [report]() and [presentation]() of this project are available.
+
+---
+
+For this research, the main focus was to gather useful insights for the generalization of entire face synthesis detection. To address this task, a state-of-the-art synthesized image detection method was first established as a baseline. In order to train and assess the performances of a wide range of models, a convenient pipeline for training, validation and evaluation was implemented. This allowed to move onto the next step: the exploration of large pre-trained vision models. More than 15 CNN architectures were explored, thanks to which interesting insights on the generalization of entire face synthesis classification were gathered.
+
+---
+
+### Getting started
+
+```python
+git clone https://github.com/mehdi533/XXXXXXX
+cd XXXXXXXXX
+```
+The required libraries are in the requirements.txt file and can be installed using the command
+```python
+pip install -r requirements.txt
+```
 
 ### Datasets
-In order to train/test using the code of this repository the architecture of the datasets have to be the following:
+
+The datasets in the same format used for this study are available on the [MMSPG page](https://www.epfl.ch/labs/mmspg/downloads/ai-synthesized-human-face-dataset/).
+
+The images of a specific generator (e.g. ProGAN) are all located in the same folder, the correct images for training, validation, and testing, are selected by loading the lists of images in the metadata folder. The emplacement of the Metadata folder has to be passed by argument, the default sets it in generated-image-detection/data.
+
+<br>The format in which the metadata is stored has to be similar to this:
 
 ```
-├── data
-│   ├── ProGAN
-│   │   ├── test
-│   │   │   ├── 0_real
-│   │   │   └── 1_fake
-│   │   ├── train
-│   │   │   ├── 0_real
-│   │   │   └── 1_fake
-│   │   └── val
-│   │       ├── 0_real
-│   │       └── 1_fake
-│   ├── PNDM
-│   │   ├── test
-│   │   │   ├── 0_real
-│   │   │   └── 1_fake
-│   │   ├── train
-│   │   │   ├── 0_real
-│   │   │   └── 1_fake
-│   │   └── val
-│   │       ├── 0_real
-│   │       └── 1_fake
+├── Metadata
+│   ├── train
+│   │   ├── 0_real
+│   │   │   ├── X_real_train_list.txt
+│   │   │   └── Y_real_train_list.txt
+│   │   ├── 1_fake
+│   │   │   ├── A_fake_train_list.txt
+│   │   │   ├── B_fake_train_list.txt
+│   │   │   ├-- ...
+│   │   │   
+│   ├── val
+│   │   ├── 0_real
+│   │   │   ├── X_real_val_list.txt
+│   │   │   └── Y_real_val_list.txt
+│   │   ├── 1_fake
+│   │   │   ├── A_fake_val_list.txt
+│   │   │   ├── B_fake_val_list.txt
+│   │   │   ├-- ...
+│   │   │   
+│   ├── test
+│   │   ├── 0_real
+│   │   │   ├── X_real_test_list.txt
+│   │   │   └── Y_real_test_list.txt
+│   │   ├── 1_fake
+│   │   │   ├── A_fake_test_list.txt
+│   │   │   ├── B_fake_test_list.txt
+│   │   │   ├-- ...
+│   │   │      
 
 ```
+
 
 If your dataset has the structure below:
 ```
