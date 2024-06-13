@@ -69,7 +69,7 @@ def upsampling(data_list):
 
     class_counts = defaultdict(int)
 
-    # Count the occurrences of each class
+    # Count amount for each class
     for label, _ in data_list:
         class_counts[label] += 1
 

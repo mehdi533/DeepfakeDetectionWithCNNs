@@ -5,11 +5,12 @@ import torch
 from util import *
 from validate import validate, metrics
 from networks.custom_models import load_custom_model
-from model_voting import Voting
-from data import create_dataloader
+from model_ensemble import Ensemble
+from dataloader import create_dataloader
 from options import Options
 
 
+# Evaluation for one model (.pth file in path flag)
 def evaluation(model_path, exp_name, opt):
     
     for possible_arch in models_names:
@@ -21,7 +22,8 @@ def evaluation(model_path, exp_name, opt):
     for present_data in list_data:
         if present_data in model_path:
             list_present.append(present_data)
-            
+    
+    # Formatize the name of the file to save
     name = exp_name + '_' + arch + "-" + '-'.join(list_present)
 
     rows = [["{} model testing on...".format(model_path.split("/")[-2])],
@@ -40,7 +42,7 @@ def evaluation(model_path, exp_name, opt):
     except:
         model.eval()
     
-    for test_model in list_data: # list_data is in utils.py
+    for test_model in list_data: # list_data is in util.py
             
         opt.no_resize = True    
 
@@ -48,7 +50,7 @@ def evaluation(model_path, exp_name, opt):
         if "FFpp" in test_model:
             opt.models = [test_model, "FFpp0"]
         else: 
-            opt.models = [test_model, "real"]
+            opt.models = [test_model, "CelebAHQ"]
         
         # returns: acc, ap, r_acc, f_acc, f1score, auc_score, prec, recall, y_true, y_pred
         acc, ap, r_acc, f_acc, f1, auc, prec, recall, _, _ = validate(model, opt, "test_list")
@@ -63,8 +65,7 @@ def evaluation(model_path, exp_name, opt):
         csv_writer.writerows(rows)
 
 
-# Double Check This
-
+# Evaluation using Model Ensemble
 def eval_voting(path_list, exp_name, opt):
 
     arch_models = []
@@ -83,7 +84,7 @@ def eval_voting(path_list, exp_name, opt):
 
     print("{} testing on...".format(name))
 
-    detector = Voting(path_list, opt)
+    detector = Ensemble(path_list, opt)
 
     for test_model in list_data:
 

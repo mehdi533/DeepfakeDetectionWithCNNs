@@ -1,18 +1,16 @@
 import torch
+import timm
 import torch.nn as nn
 import torchvision.models as models
 from torchvision.models.vgg import VGG16_Weights
 from torchvision.models.efficientnet import EfficientNet_B0_Weights, EfficientNet_B4_Weights
 from torchvision.models import ConvNeXt_Base_Weights
 from transformers import AutoModel, AutoConfig
-from transformers import Blip2Processor, Blip2VisionModel
-from transformers import BitImageProcessor, BitForImageClassification
-import timm
+from transformers import BitForImageClassification
+# from transformers import Blip2Processor, Blip2VisionModel
 
             
 def load_custom_model(name: str, intermediate, intermediate_dim, freeze, pre_trained):
-
-    model = None
 
     if name == 'res50':
         model = ResNet50(add_intermediate_layer=intermediate, intermediate_dim=intermediate_dim, freezed=freeze, pre_trained=pre_trained)
@@ -76,19 +74,6 @@ def load_custom_model(name: str, intermediate, intermediate_dim, freeze, pre_tra
     return model
 
 
-# class Blip2VisionForImageClassification(nn.Module):
-#     def __init__(self, base_model, num_classes=1):
-#         super(Blip2VisionForImageClassification, self).__init__()
-#         self.base_model = base_model
-#         self.classifier = nn.Linear(base_model.config.hidden_size, num_classes)
-        
-#     def forward(self, pixel_values):
-#         outputs = self.base_model(pixel_values=pixel_values)
-#         pooled_output = outputs.last_hidden_state[:, 0]  # Use the CLS token
-#         logits = self.classifier(pooled_output)
-#         return logits
-
-
 class RegNetModel(nn.Module):
     def __init__(self, model_name='regnet_y_400mf', num_classes=1, init_gain=0.02, pre_trained=True, freeze=False, add_intermediate_layer=True, intermediate_dim=512):
         super(RegNetModel, self).__init__()
@@ -118,71 +103,7 @@ class RegNetModel(nn.Module):
         return self.model(x)
     
 
-# class HuggingModel(nn.Module):
-#     def __init__(self, base_mod_name, num_classes=1, init_gain=0.02, intermediate_dim=64, add_intermediate_layer=False, freezed=False, pre_trained=True):
-#         super().__init__()
-        
-#         self.config = AutoConfig.from_pretrained(base_mod_name)
-#         self.base_model = AutoModel.from_pretrained(base_mod_name, config=self.config)
-        
-#         if not pre_trained:
-#             self.reset_parameters(init_gain)
-    
-#         if hasattr(self.config, 'hidden_size'):
-#             hidden_size = self.config.hidden_size
-#         elif hasattr(self.base_model.classifier, 'in_features'):
-#             hidden_size = self.base_model.classifier.in_features
-#         elif hasattr(self.base_model.classifier, 'in_channels'):
-#             hidden_size = self.base_model.classifier.in_channels
-#         else:
-#             raise AttributeError(f"The base model's classifier does not have 'in_features' or 'in_channels' attributes.")
-        
-#         if freezed:
-#             for param in self.base_model.parameters():
-#                 param.requires_grad = False
-        
-#         if add_intermediate_layer:
-#             self.classifier = nn.Sequential(
-#                 nn.Linear(hidden_size, intermediate_dim),
-#                 nn.ReLU(),
-#                 nn.Linear(intermediate_dim, num_classes)
-#             )
-#             torch.nn.init.normal_(self.classifier[0].weight.data, 0.0, init_gain)
-#             torch.nn.init.normal_(self.classifier[2].weight.data, 0.0, init_gain)
-#         else:
-#             self.classifier = nn.Linear(hidden_size, num_classes)
-#             torch.nn.init.normal_(self.classifier.weight.data, 0.0, init_gain)
-        
-#         self.pooler = nn.AdaptiveAvgPool1d(1)
-#         self.lin_layer = nn.Linear(hidden_size, num_classes)
-    
-#     def reset_parameters(self, init_gain):
-#         print("Reseting parameters...")
-#         for module in self.base_model.modules():
-#             if isinstance(module, nn.Linear):
-#                 torch.nn.init.normal_(module.weight.data, 0.0, init_gain)
-#                 if module.bias is not None:
-#                     torch.nn.init.zeros_(module.bias.data)
-#             elif isinstance(module, nn.Embedding):
-#                 torch.nn.init.normal_(module.weight.data, 0.0, init_gain)
-#             elif isinstance(module, nn.LayerNorm):
-#                 torch.nn.init.ones_(module.weight.data)
-#                 torch.nn.init.zeros_(module.bias.data)
-#             elif isinstance(module, nn.Conv1d) or isinstance(module, nn.Conv2d):
-#                 torch.nn.init.normal_(module.weight.data, 0.0, init_gain)
-#                 if module.bias is not None:
-#                     torch.nn.init.zeros_(module.bias.data)
-
-#     def forward(self, inputs):
-#         model_output = self.base_model(inputs)
-#         features = model_output.last_hidden_state  
-
-#         features = features.permute(0, 2, 1)
-
-#         pooled_features = self.pooler(features).squeeze(-1)
-#         outs = self.lin_layer(pooled_features)
-#         return outs
-
+# Use to load models on HuggingFace (doesn't work for all)
 class HuggingModel(nn.Module):
     def __init__(self, base_mod_name, num_classes=1, init_gain=0.02, intermediate_dim=64, add_intermediate_layer=False, freezed=False, pre_trained=True):
         super().__init__()
@@ -192,7 +113,7 @@ class HuggingModel(nn.Module):
         
         if not pre_trained:
             self.reset_parameters(init_gain)
-    
+
         if hasattr(self.config, 'hidden_size'):
             hidden_size = self.config.hidden_size
         elif hasattr(self.base_model.classifier, 'in_features'):
@@ -246,6 +167,7 @@ class HuggingModel(nn.Module):
 
         pooled_features = self.pooler(features).squeeze(-1)
 
+        # Used for test with kNN
         if return_features:
             return pooled_features
         
@@ -256,7 +178,6 @@ class HuggingModel(nn.Module):
         return self.forward(inputs, return_features=True)
 
 
-# Empty, fine tune, freeze (with additional layer)
 class ConvNeXt_base(nn.Module):
     def __init__(self, num_classes=1, init_gain=0.02, intermediate_dim=64, add_intermediate_layer=False, freezed=False, pre_trained=True):
         super(ConvNeXt_base, self).__init__()
@@ -280,7 +201,7 @@ class ConvNeXt_base(nn.Module):
             self.model.classifier[2] = nn.Sequential(
                 self.intermediate_layer,
                 nn.ReLU(inplace=True),
-                nn.Linear(intermediate_dim, num_classes)  # Output layer kNN voting
+                nn.Linear(intermediate_dim, num_classes)  # Output layer 
             )
             torch.nn.init.normal_(self.intermediate_layer.weight.data, 0.0, init_gain)
             torch.nn.init.normal_(self.model.classifier[2][2].weight.data, 0.0, init_gain)
@@ -312,7 +233,6 @@ class CustomHead(nn.Module):
             torch.nn.init.normal_(self.fc.weight.data, 0.0, init_gain)
 
     def forward(self, x, pre_logits=None):
-        # Check if pre_logits is callable and use it if so
         if callable(pre_logits):
             x = pre_logits(x)
         x = self.global_pool(x)
@@ -320,7 +240,7 @@ class CustomHead(nn.Module):
         x = self.fc(x)
         return x
 
-# Empty, fine tune, freeze (with additional layer)
+
 class CoatNetModel(nn.Module):
     def __init__(self, base_mod_name, num_classes=1, init_gain=0.02, intermediate_dim=64, add_intermediate_layer=False, freezed=False, pre_trained=True):
         super().__init__()
@@ -337,15 +257,12 @@ class CoatNetModel(nn.Module):
     def forward(self, inputs):
         return self.base_model(inputs)
 
-# Empty, fine tune, freeze (with additional layer)
+
 class ResNextModel(nn.Module):
     def __init__(self, base_mod_name, num_classes=1, init_gain=0.02, intermediate_dim=64, add_intermediate_layer=False, freezed=False, pre_trained=True):
         super().__init__()
         
         self.base_model = timm.create_model(base_mod_name, pretrained=pre_trained)
-        
-        # if not pre_trained:
-        #     self.reset_parameters(init_gain)
         
         in_features = self.base_model.fc.in_features
         
@@ -367,31 +284,20 @@ class ResNextModel(nn.Module):
         
         self.base_model.fc = self.classifier
     
-    def reset_parameters(self, init_gain):
-        print("Reseting parameters...")
-        for module in self.base_model.modules():
-            if isinstance(module, nn.Linear):
-                torch.nn.init.normal_(module.weight.data, 0.0, init_gain)
-                if module.bias is not None:
-                    torch.nn.init.zeros_(module.bias.data)
-            elif isinstance(module, nn.Conv1d) or isinstance(module, nn.Conv2d):
-                torch.nn.init.normal_(module.weight.data, 0.0, init_gain)
-                if module.bias is not None:
-                    torch.nn.init.zeros_(module.bias.data)
-    
     def forward(self, inputs):
         return self.base_model(inputs)
     
-# Empty, fine tune, freeze (with additional layer)
+
 class BiTModel(nn.Module):
     def __init__(self, base_mod_name, num_classes=1, init_gain=0.02, intermediate_dim=64, add_intermediate_layer=False, freezed=False, pre_trained=True):
         super().__init__()
-
+        
         self.base_model = BitForImageClassification.from_pretrained(base_mod_name)
 
         if not pre_trained:
             self.reset_parameters(init_gain)
         
+        # Gets dimension of last layer of the loaded model
         if isinstance(self.base_model.classifier, nn.Sequential):
             for layer in self.base_model.classifier:
                 if isinstance(layer, nn.Linear):
@@ -399,15 +305,13 @@ class BiTModel(nn.Module):
                     break
         elif hasattr(self.base_model.classifier, 'in_features'):
             hidden_size = self.base_model.classifier.in_features
-        else:
-            raise ValueError("Cannot determine hidden size from the model classifier")
 
         # Freeze all layers except the one we will add later
         if freezed:
             for param in self.base_model.parameters():
                 param.requires_grad = False
         
-        # Option to add an additional layer (intermediate dimension)
+        # Option to add an additional layer (when training with frozen backbone)
         if add_intermediate_layer:
             self.classifier = nn.Sequential(
                 nn.Linear(hidden_size, intermediate_dim),
@@ -442,7 +346,7 @@ class BiTModel(nn.Module):
         logits = outputs.logits
         return self.classifier(logits)
     
-# Empty, fine tune, freeze (with additional layer)
+
 class EfficientNet_b0(nn.Module):
     def __init__(self, num_classes=1, init_gain=0.02, intermediate_dim=64, add_intermediate_layer=False, freezed=False, pre_trained=True):
         super(EfficientNet_b0, self).__init__()
@@ -466,7 +370,7 @@ class EfficientNet_b0(nn.Module):
             self.model.classifier[1] = nn.Sequential(
                 self.intermediate_layer,
                 nn.ReLU(inplace=True),
-                nn.Linear(intermediate_dim, num_classes)  # Output layer kNN voting
+                nn.Linear(intermediate_dim, num_classes)  # Output layer 
             )
             torch.nn.init.normal_(self.intermediate_layer.weight.data, 0.0, init_gain)
             torch.nn.init.normal_(self.model.classifier[1][2].weight.data, 0.0, init_gain)
@@ -477,7 +381,7 @@ class EfficientNet_b0(nn.Module):
     def forward(self, x):
         return self.model(x)
     
-# Empty, fine tune, freeze (with additional layer)
+
 class EfficientNet_b4(nn.Module):
     def __init__(self, num_classes=1, init_gain=0.02, intermediate_dim=64, add_intermediate_layer=False, freezed=False, pre_trained=True):
         super(EfficientNet_b4, self).__init__()
@@ -501,7 +405,7 @@ class EfficientNet_b4(nn.Module):
             self.model.classifier[1] = nn.Sequential(
                 self.intermediate_layer,
                 nn.ReLU(inplace=True),
-                nn.Linear(intermediate_dim, num_classes)  # Output layer kNN voting
+                nn.Linear(intermediate_dim, num_classes)  # Output layer 
             )
             torch.nn.init.normal_(self.intermediate_layer.weight.data, 0.0, init_gain)
             torch.nn.init.normal_(self.model.classifier[1][2].weight.data, 0.0, init_gain)
@@ -512,7 +416,7 @@ class EfficientNet_b4(nn.Module):
     def forward(self, x):
         return self.model(x)
 
-# Empty, fine tune, freeze (with additional layer)
+
 class VGG16(nn.Module):
     def __init__(self, num_classes=1, init_gain=0.02, intermediate_dim=64, add_intermediate_layer=False, freezed=False, pre_trained=True):
         super(VGG16, self).__init__()
@@ -536,7 +440,7 @@ class VGG16(nn.Module):
             self.model.classifier[6] = nn.Sequential(
                 self.intermediate_layer,
                 nn.ReLU(inplace=True), 
-                nn.Linear(intermediate_dim, num_classes)  # Output layer kNN voting
+                nn.Linear(intermediate_dim, num_classes)  # Output layer 
             )
             torch.nn.init.normal_(self.intermediate_layer.weight.data, 0.0, init_gain)
             torch.nn.init.normal_(self.model.classifier[6][2].weight.data, 0.0, init_gain)
@@ -547,7 +451,7 @@ class VGG16(nn.Module):
     def forward(self, x):
         return self.model(x)
     
-# Empty, fine tune, freeze (with additional layer)
+
 class ResNet50(nn.Module):
     def __init__(self, num_classes=1, init_gain=0.02, intermediate_dim=64, add_intermediate_layer=False, freezed=False, pre_trained=True):
         super(ResNet50, self).__init__()
@@ -571,7 +475,7 @@ class ResNet50(nn.Module):
             self.model.fc = nn.Sequential(
                 self.intermediate_layer,
                 nn.ReLU(inplace=True),
-                nn.Linear(intermediate_dim, num_classes)  # Output layer / Voting with kNN
+                nn.Linear(intermediate_dim, num_classes)  # Output layer inter_dim --> 1 (num classes)
             )
             torch.nn.init.normal_(self.intermediate_layer.weight.data, 0.0, init_gain)
             torch.nn.init.normal_(self.model.fc[2].weight.data, 0.0, init_gain)
@@ -581,3 +485,16 @@ class ResNet50(nn.Module):
 
     def forward(self, x):
         return self.model(x)
+    
+
+# class Blip2VisionForImageClassification(nn.Module):
+#     def __init__(self, base_model, num_classes=1):
+#         super(Blip2VisionForImageClassification, self).__init__()
+#         self.base_model = base_model
+#         self.classifier = nn.Linear(base_model.config.hidden_size, num_classes)
+        
+#     def forward(self, pixel_values):
+#         outputs = self.base_model(pixel_values=pixel_values)
+#         pooled_output = outputs.last_hidden_state[:, 0]  # Use the CLS token
+#         logits = self.classifier(pooled_output)
+#         return logits

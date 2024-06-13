@@ -4,7 +4,7 @@ import torch
 
 from networks.custom_models import load_custom_model
 from util import models_names
-from data import create_dataloader
+from dataloader import create_dataloader
 
 from sklearn.linear_model import LinearRegression
 from sklearn.neighbors import KNeighborsClassifier
@@ -114,7 +114,7 @@ def voting_prediction(list_of_predictions):
     return np.array(image_score)
 
 
-class Voting():
+class Ensemble():
 
     def __init__(self, list_path_models: str, opt):
         

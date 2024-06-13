@@ -1,7 +1,5 @@
 import os
 import torch
-import numpy as np
-# from torch.utils.data.sampler import WeightedRandomSampler
 from data.datasets import get_dataset_metadata
 from data.sampling import *
 

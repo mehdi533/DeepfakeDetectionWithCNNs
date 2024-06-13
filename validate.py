@@ -1,7 +1,7 @@
 import torch
 import numpy as np
 from sklearn.metrics import average_precision_score, accuracy_score, f1_score, roc_auc_score, precision_score, recall_score
-from data import create_dataloader
+from dataloader import create_dataloader
 
 
 def metrics(y_true, y_pred, threshold=0.5):
