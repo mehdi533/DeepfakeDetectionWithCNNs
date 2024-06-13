@@ -1,7 +1,7 @@
 # Exploring Diffusion-Generated Image Detection Methods
 
-Research done by: Mehdi Abdallahi\\
-Supervisor: Yuhang Lu\\
+Research done by: Mehdi Abdallahi\n
+Supervisor: Yuhang Lu\n
 Professor: Dr. Touradj Ebrahimi
 
 ---
