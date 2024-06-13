@@ -65,7 +65,7 @@ The images of a specific generator (e.g. ProGAN) are all located in the same fol
 
 ```
 
-For the images, they have to be stored like this:
+<br>For the images, they have to be stored like this:
 ```
 ├── data
 │   ├── ProGAN
