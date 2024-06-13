@@ -30,6 +30,7 @@ pip install -r requirements.txt
 The datasets in the same format used for this study are available on the [MMSPG page](https://www.epfl.ch/labs/mmspg/downloads/ai-synthesized-human-face-dataset/).
 
 The images of a specific generator (e.g. ProGAN) are all located in the same folder, the correct images for training, validation, and testing, are selected by loading the lists of images in the metadata folder. The emplacement of the Metadata folder has to be passed by argument, by default it is set as generated-image-detection/data/metadata.
+
 <br>The format in which the metadata is stored has to be similar to this:
 
 ```
@@ -64,27 +65,21 @@ The images of a specific generator (e.g. ProGAN) are all located in the same fol
 
 ```
 
-
-If your dataset has the structure below:
+For the images, they have to be stored like this:
 ```
 ├── data
 │   ├── ProGAN
-│   ├── PNDM
-│   ├── CelebA
-│   ├── ...
-
+│   │   ├── 00000.png
+│   │   ├── ...
+│   ├── DDIM
+│   │   ├── 00000.png
+│   │   ├── ...
+│   ├── DDPM
+│   │   ├── 00000.png
+│   │   ├── ...
 ```
 
-You can run this command in order to create the required file structure:
-```
-python data_restruct.py
-```
-Which automatically separates the data in train/val/test (0.8/0.1/0.1) sets. However, there is a slight issue with the restructuring and the `0_real` file does not appear properly in the test set, this can be fixed by moving the folder `data/test/0_real` into each dataset appearing under test i.e. `data/test/${dataset}/`.
-
-> The datasets that will serve as training and test set need to be specified in the code, as well as the real dataset which will populate the `0_real` folder. `source_dir` and `dest_dir` variables need to be defined to define the location of the files.
-
----
-
+> It is easy to add new datasets for training/testing. When testing on datasets that do not have the same name as the ones used for this study, please adapt the "list_data" in the util.py file. Your models will then be tested on the datasets present in this list.
 
 ---
 
