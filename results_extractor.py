@@ -40,15 +40,18 @@ text = dict.fromkeys(test, '')
 
 # for filename in os.listdir(dir):
 
-filename = "/home/abdallah/Deepfake-Detection/results/SWINmetamodel0806_swin-FFpp3_swin-ProGAN.csv"
-
+# filename = "/home/abdallah/Deepfake-Detection/results/VOTING_DDIMPROGAN_swin-ProGAN_swin-DDIM_swin-ProGAN-DDIM.csv"
+filename = "/home/abdallah/Deepfake-Detection/results/0606_swin_tiny-FFpp1-FFpp2-FFpp3.csv"
+# /home/abdallah/Deepfake-Detection/results/VOTING_FFPP123_swin-FFpp3_swin-FFpp2_swin-FFpp1.csv
+# /home/abdallah/Deepfake-Detection/results/0606_swin_tiny-FFpp1-FFpp2-FFpp3.csv
+print(filename)
 # tmp = pd.read_csv(os.path.join(dir, filename),skiprows=1).set_index("testset")
 tmp = pd.read_csv(filename,skiprows=1).set_index("testset")
 
 tmp = tmp[["accuracy", "roc score", "avg precision", "precision"]]
 tmp.rename(columns={'accuracy': 'Accuracy', 'roc score': 'AUC', 'avg precision': 'Avg. precision', "precision": "Precision"}, inplace=True)
 tmp = tmp.round(5)
-print(tmp)
+# print(tmp)
 
 # for key in models.keys():
 
@@ -64,15 +67,15 @@ for model_test in test:
   if model_test == "FFpp4":
     name = "NeuralTextures"
   # text[model_test] += f"{name}         & {tmp['Accuracy'].loc[model_test]:.5f}          & {tmp['AUC'].loc[model_test]:.5f}         & {tmp['Avg. precision'].loc[model_test]:.5f}              & {tmp['Precision'].loc[model_test]:.5f}      \\\\ \hline\n"
-  text[model_test] += f"{tmp['Avg. precision'].loc[model_test]*100:.2f} / {tmp['AUC'].loc[model_test]*100:.2f}"
+  text[model_test] += f"{tmp['Avg. precision'].loc[model_test]*100:.2f}"# / {tmp['AUC'].loc[model_test]*100:.2f}"
     # AP / AUC & AP / AUC & AP / AUC
 
-GANS = text["VQGAN"] + " & " + text["StyleGAN"] + " & " + text["VQGAN"]
-DMs = text["DDIM"] + " & " + text["DDPM"] + " & " + text["PNDM"] + " & " +  text["LDM"]
+GANS = text["VQGAN"] + " & " + text["StyleGAN"] + " & " + text["VQGAN"] + ' & ' + text["DDIM"] + " & " + text["DDPM"] + " & " + text["PNDM"] + " & " +  text["LDM"]
+# DMs
 FFpps = text["FFpp1"] + " & " + text["FFpp2"] + " & " + text["FFpp3"] + " & " +  text["FFpp4"]
 
 print(GANS)
-print(DMs)
+# print(DMs)
 print(FFpps)
 # print(text["FFpp1"])
 # print(text["FFpp2"])

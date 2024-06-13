@@ -37,9 +37,10 @@ ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 
 class DatasetFromMetadata(torch.utils.data.Dataset):
-    def __init__(self, data_list, transform=None):
+    def __init__(self, data_list, transform=None, cropping=False):
         self.data_list = data_list  # List of (label, filename) tuples
         self.transform = transform
+        self.cropping = cropping
         self.expanded_data_list = self._expand_data_list(data_list)
 
     def _expand_data_list(self, data_list):
@@ -50,29 +51,33 @@ class DatasetFromMetadata(torch.utils.data.Dataset):
         return expanded_list
 
     def __len__(self):
-        return len(self.expanded_data_list)
+        if self.cropping:
+            return len(self.expanded_data_list)
+        else:
+            return len(self.data_list)
 
     def __getitem__(self, index):
-        # Get label, filename, and crop index from the expanded list
-        label, image_path, crop_idx = self.expanded_data_list[index]
-        image = Image.open(image_path).convert('RGB')
+        
+        if self.cropping:
+            label, image_path, crop_idx = self.expanded_data_list[index]
+            image = Image.open(image_path).convert('RGB')
+            # Determine the size of the crops
+            width, height = image.size
+            crop_width, crop_height = width // 5, height // 4
 
-        # Determine the size of the crops
-        width, height = image.size
-        crop_width, crop_height = width // 5, height // 4
+            # Calculate the coordinates for cropping
+            x = (crop_idx % 5) * crop_width
+            y = (crop_idx // 5) * crop_height
 
-        # Calculate the coordinates for cropping
-        x = (crop_idx % 5) * crop_width
-        y = (crop_idx // 5) * crop_height
+            image = image.crop((x, y, x + crop_width, y + crop_height))
+        else:
+            label, image_path = self.data_list[index]
+            image = Image.open(image_path).convert('RGB') 
 
-        # Crop the image
-        crop = image.crop((x, y, x + crop_width, y + crop_height))
-
-        # Apply transformations if any
         if self.transform:
-            crop = self.transform(crop)
+            image = self.transform(image)
 
-        return crop, torch.tensor(int(label))
+        return image, torch.tensor(int(label))
 
 
 def get_dataset_metadata(opt, image_list):
@@ -87,93 +92,93 @@ def get_dataset_metadata(opt, image_list):
         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
     ])
 
-    dataset = DatasetFromMetadata(image_list, transform)
+    dataset = DatasetFromMetadata(image_list, transform, opt.cropping)
 
-    # Optional additional data (blurring)
-    if opt.blurring:
-        print("Blurring Active")
-        transform_blur = transforms.Compose([transforms.Lambda(lambda img: blurring(img)), transform])
-        dataset = ConcatDataset([dataset, DatasetFromMetadata(image_list, transform_blur)])
+    # # Optional additional data (blurring)
+    # if opt.blurring:
+    #     print("Blurring Active")
+    #     transform_blur = transforms.Compose([transforms.Lambda(lambda img: blurring(img)), transform])
+    #     dataset = ConcatDataset([dataset, DatasetFromMetadata(image_list, transform_blur)])
     
-    # Optional additional data (compression)
-    if opt.compression:
-        print("Compression Active")
-        transform_comp = transforms.Compose([transforms.Lambda(lambda img: compressing(img)), transform])
-        dataset = ConcatDataset([dataset, DatasetFromMetadata(image_list, transform_comp)])
+    # # Optional additional data (compression)
+    # if opt.compression:
+    #     print("Compression Active")
+    #     transform_comp = transforms.Compose([transforms.Lambda(lambda img: compressing(img)), transform])
+    #     dataset = ConcatDataset([dataset, DatasetFromMetadata(image_list, transform_comp)])
 
     return dataset
 
 # Functions for augmentation (compression and blurring)
 
-def compressing(image, jpg_method='cv2', compr_prob=0, jpg_qual=[75]):
-    img = np.array(image)
+# def compressing(image, jpg_method='cv2', compr_prob=0, jpg_qual=[75]):
+#     img = np.array(image)
 
-    if random() < compr_prob:
-        method = sample_discrete(jpg_method)
-        qual = sample_discrete(jpg_qual)
-        img = jpeg_from_key(img, qual, method)
-        return Image.fromarray(img)
-    else:
-        return image
-
-
-def blurring(image, blur_prob=0, blur_sig=0.5):
-    img = np.array(image)
-
-    if random() < blur_prob:
-        sig = sample_continuous(blur_sig)
-        gaussian_blur(img, sig)
-        return Image.fromarray(img)
-    else:
-        return image
+#     if random() < compr_prob:
+#         method = sample_discrete(jpg_method)
+#         qual = sample_discrete(jpg_qual)
+#         img = jpeg_from_key(img, qual, method)
+#         return Image.fromarray(img)
+#     else:
+#         return image
 
 
-def sample_continuous(s):
-    if len(s) == 1:
-        return s[0]
-    if len(s) == 2:
-        rg = s[1] - s[0]
-        return random() * rg + s[0]
-    raise ValueError("Length of iterable s should be 1 or 2.")
+# def blurring(image, blur_prob=0, blur_sig=0.5):
+#     img = np.array(image)
+
+#     if random() < blur_prob:
+#         sig = sample_continuous(blur_sig)
+#         gaussian_blur(img, sig)
+#         return Image.fromarray(img)
+#     else:
+#         return image
 
 
-def sample_discrete(s):
-    if len(s) == 1:
-        return s[0]
-    return choice(s)
+# def sample_continuous(s):
+#     if len(s) == 1:
+#         return s[0]
+#     if len(s) == 2:
+#         rg = s[1] - s[0]
+#         return random() * rg + s[0]
+#     raise ValueError("Length of iterable s should be 1 or 2.")
 
 
-def gaussian_blur(img, sigma):
-    gaussian_filter(img[:,:,0], output=img[:,:,0], sigma=sigma)
-    gaussian_filter(img[:,:,1], output=img[:,:,1], sigma=sigma)
-    gaussian_filter(img[:,:,2], output=img[:,:,2], sigma=sigma)
+# def sample_discrete(s):
+#     if len(s) == 1:
+#         return s[0]
+#     return choice(s)
 
 
-def cv2_jpg(img, compress_val):
-    img_cv2 = img[:,:,::-1]
-    encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), compress_val]
-    result, encimg = cv2.imencode('.jpg', img_cv2, encode_param)
-    decimg = cv2.imdecode(encimg, 1)
-    return decimg[:,:,::-1]
+# def gaussian_blur(img, sigma):
+#     gaussian_filter(img[:,:,0], output=img[:,:,0], sigma=sigma)
+#     gaussian_filter(img[:,:,1], output=img[:,:,1], sigma=sigma)
+#     gaussian_filter(img[:,:,2], output=img[:,:,2], sigma=sigma)
 
 
-def pil_jpg(img, compress_val):
-    out = BytesIO()
-    img = Image.fromarray(img)
-    img.save(out, format='jpeg', quality=compress_val)
-    img = Image.open(out)
-    # load from memory before ByteIO closes
-    img = np.array(img)
-    out.close()
-    return img
+# def cv2_jpg(img, compress_val):
+#     img_cv2 = img[:,:,::-1]
+#     encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), compress_val]
+#     result, encimg = cv2.imencode('.jpg', img_cv2, encode_param)
+#     decimg = cv2.imdecode(encimg, 1)
+#     return decimg[:,:,::-1]
 
 
-jpeg_dict = {'cv2': cv2_jpg, 'pil': pil_jpg}
+# def pil_jpg(img, compress_val):
+#     out = BytesIO()
+#     img = Image.fromarray(img)
+#     img.save(out, format='jpeg', quality=compress_val)
+#     img = Image.open(out)
+#     # load from memory before ByteIO closes
+#     img = np.array(img)
+#     out.close()
+#     return img
 
 
-def jpeg_from_key(img, compress_val, key):
-    method = jpeg_dict[key]
-    return method(img, compress_val)
+# jpeg_dict = {'cv2': cv2_jpg, 'pil': pil_jpg}
+
+
+# def jpeg_from_key(img, compress_val, key):
+#     method = jpeg_dict[key]
+#     return method(img, compress_val)
 
 
 def compress_image(image, quality=75):
@@ -189,7 +194,7 @@ def compress_image(image, quality=75):
 
 
 class RandomJPEGCompression:
-    def __init__(self, prob=0.5, quality=50):
+    def __init__(self, prob=0, quality=75):
         self.prob = prob
         self.quality = quality
 

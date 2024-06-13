@@ -1,0 +1,23 @@
+----------------- Options ---------------
+                     arch: swin_tiny                     	[default: res50]
+               batch_size: 128                           	[default: 64]
+                blur_prob: 0.2                           	[default: 0.0]
+                 blurring: 0                             
+          checkpoints_dir: ../../../scratch/izar/abdallah/COMPR_TEST/	[default: ./checkpointsMODELS]
+               compr_prob: 0.0                           
+              compression: 0                             
+                 dataroot: ./dataset/                    
+                   freeze: False                         
+             intermediate: False                         
+         intermediate_dim: 64                            
+                  isTrain: False                         	[default: None]
+                 metadata: ./dataset/Metadata/           
+                   models: real,ProGAN                   	[default: real]
+       models_folder_path: ./checkpoints                 
+            multiply_real: 1                             
+                     name: blur02_0706                   	[default: experiment_name]
+              num_threads: 1                             
+                     path: None                          
+              pre_trained: True                          
+Date of start: 2024-06-07 21:17:04.817478
+----------------- End -------------------

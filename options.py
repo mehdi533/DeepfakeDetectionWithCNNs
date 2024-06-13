@@ -20,6 +20,7 @@ class Options():
         parser.add_argument('--intermediate_dim', type=int, default=64, help='Size of the intermediate dimension')
         parser.add_argument("--freeze", action=argparse.BooleanOptionalAction, type=bool, default=False, help='freeze all layers except classifier')
         parser.add_argument("--pre_trained", action=argparse.BooleanOptionalAction, type=bool, default=True, help='load pre trained weights')
+        parser.add_argument("--cropping", action=argparse.BooleanOptionalAction, type=bool, default=False, help='Crop images or not')
 
         # Models that should be trained on (e.g: FFpp0,FFpp1 or real,ProGAN...)
         parser.add_argument('--models', default='real', help='models to take into account')

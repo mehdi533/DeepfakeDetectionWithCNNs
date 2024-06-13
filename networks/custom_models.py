@@ -137,6 +137,71 @@ class RegNetModel(nn.Module):
         return self.model(x)
     
 
+# class HuggingModel(nn.Module):
+#     def __init__(self, base_mod_name, num_classes=1, init_gain=0.02, intermediate_dim=64, add_intermediate_layer=False, freezed=False, pre_trained=True):
+#         super().__init__()
+        
+#         self.config = AutoConfig.from_pretrained(base_mod_name)
+#         self.base_model = AutoModel.from_pretrained(base_mod_name, config=self.config)
+        
+#         if not pre_trained:
+#             self.reset_parameters(init_gain)
+    
+#         if hasattr(self.config, 'hidden_size'):
+#             hidden_size = self.config.hidden_size
+#         elif hasattr(self.base_model.classifier, 'in_features'):
+#             hidden_size = self.base_model.classifier.in_features
+#         elif hasattr(self.base_model.classifier, 'in_channels'):
+#             hidden_size = self.base_model.classifier.in_channels
+#         else:
+#             raise AttributeError(f"The base model's classifier does not have 'in_features' or 'in_channels' attributes.")
+        
+#         if freezed:
+#             for param in self.base_model.parameters():
+#                 param.requires_grad = False
+        
+#         if add_intermediate_layer:
+#             self.classifier = nn.Sequential(
+#                 nn.Linear(hidden_size, intermediate_dim),
+#                 nn.ReLU(),
+#                 nn.Linear(intermediate_dim, num_classes)
+#             )
+#             torch.nn.init.normal_(self.classifier[0].weight.data, 0.0, init_gain)
+#             torch.nn.init.normal_(self.classifier[2].weight.data, 0.0, init_gain)
+#         else:
+#             self.classifier = nn.Linear(hidden_size, num_classes)
+#             torch.nn.init.normal_(self.classifier.weight.data, 0.0, init_gain)
+        
+#         self.pooler = nn.AdaptiveAvgPool1d(1)
+#         self.lin_layer = nn.Linear(hidden_size, num_classes)
+    
+#     def reset_parameters(self, init_gain):
+#         print("Reseting parameters...")
+#         for module in self.base_model.modules():
+#             if isinstance(module, nn.Linear):
+#                 torch.nn.init.normal_(module.weight.data, 0.0, init_gain)
+#                 if module.bias is not None:
+#                     torch.nn.init.zeros_(module.bias.data)
+#             elif isinstance(module, nn.Embedding):
+#                 torch.nn.init.normal_(module.weight.data, 0.0, init_gain)
+#             elif isinstance(module, nn.LayerNorm):
+#                 torch.nn.init.ones_(module.weight.data)
+#                 torch.nn.init.zeros_(module.bias.data)
+#             elif isinstance(module, nn.Conv1d) or isinstance(module, nn.Conv2d):
+#                 torch.nn.init.normal_(module.weight.data, 0.0, init_gain)
+#                 if module.bias is not None:
+#                     torch.nn.init.zeros_(module.bias.data)
+
+#     def forward(self, inputs):
+#         model_output = self.base_model(inputs)
+#         features = model_output.last_hidden_state  
+
+#         features = features.permute(0, 2, 1)
+
+#         pooled_features = self.pooler(features).squeeze(-1)
+#         outs = self.lin_layer(pooled_features)
+#         return outs
+
 class HuggingModel(nn.Module):
     def __init__(self, base_mod_name, num_classes=1, init_gain=0.02, intermediate_dim=64, add_intermediate_layer=False, freezed=False, pre_trained=True):
         super().__init__()
@@ -192,15 +257,23 @@ class HuggingModel(nn.Module):
                 if module.bias is not None:
                     torch.nn.init.zeros_(module.bias.data)
 
-    def forward(self, inputs):
+    def forward(self, inputs, return_features=False):
         model_output = self.base_model(inputs)
         features = model_output.last_hidden_state  
 
         features = features.permute(0, 2, 1)
 
         pooled_features = self.pooler(features).squeeze(-1)
+
+        if return_features:
+            return pooled_features
+        
         outs = self.lin_layer(pooled_features)
         return outs
+
+    def extract_features(self, inputs):
+        return self.forward(inputs, return_features=True)
+
 
 # Empty, fine tune, freeze (with additional layer)
 class ConvNeXt_base(nn.Module):

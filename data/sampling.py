@@ -29,7 +29,7 @@ def downsampling(data_list):
     return balanced_data_list
 
 
-def multiply_class(data_list, label_up, multiplier=2):
+def multiply_class(data_list, label_up, multiplier=1):
 
     class_counts = defaultdict(int)
 

@@ -96,7 +96,6 @@ def eval_voting(path_list, exp_name, opt):
             opt.models = [test_model, "real"]
 
         data_loader = create_dataloader(opt, "test_list")
-
         y_true, y_pred = detector.synth_real_detector(data_loader)
         acc, ap, r_acc, f_acc, f1, auc, prec, recall, _, _ = metrics(y_true, y_pred)
 

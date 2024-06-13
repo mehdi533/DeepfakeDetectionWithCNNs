@@ -5,7 +5,7 @@ import torch
 models_names = ["efficient_b0", "efficient_b4", "vgg16", "res50", "resnext", "coatnet", "swin_large", "swin_base", "swin_tiny", "vit_base", "vit_large", "deit_base", "deit_small", "bit", "blip2", "beit", "convnext", "regnet"]
 
 # list of different possible data
-list_data = ["FFpp1", "FFpp2", "FFpp3", "FFpp4", "StyleGAN", "VQGAN", "PNDM", "DDPM", "LDM", "DDIM", "ProGAN"]
+list_data = ["StyleGAN", "FFpp1", "FFpp2", "FFpp3", "FFpp4", "VQGAN", "PNDM", "DDPM", "LDM", "DDIM", "ProGAN"]
 
 def mkdirs(paths):
     if isinstance(paths, list) and not isinstance(paths, str):
