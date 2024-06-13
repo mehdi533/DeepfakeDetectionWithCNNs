@@ -33,7 +33,6 @@ def validate(model, opt, __type):
             except:
                 in_tens = img
             
-            # Is it better to use sigmoid or softmax?
             y_pred.extend(model(in_tens).sigmoid().flatten().tolist())
             y_true.extend(label.flatten().tolist())
 

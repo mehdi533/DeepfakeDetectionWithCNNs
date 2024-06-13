@@ -9,9 +9,6 @@ from model_voting import Voting
 from data import create_dataloader
 from options import Options
 
-results_dir = './results/'
-mkdir(results_dir)
-
 
 def evaluation(model_path, exp_name, opt):
     

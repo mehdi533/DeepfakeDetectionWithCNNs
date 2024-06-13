@@ -14,98 +14,79 @@ def load_custom_model(name: str, intermediate, intermediate_dim, freeze, pre_tra
 
     model = None
 
-    # Empty, fine-tune, freeze
     if name == 'res50':
         model = ResNet50(add_intermediate_layer=intermediate, intermediate_dim=intermediate_dim, freezed=freeze, pre_trained=pre_trained)
     
-    # Empty, fine-tune, freeze (Comparison with other models)
     elif name == 'vgg16':
         model = VGG16(add_intermediate_layer=intermediate, intermediate_dim=intermediate_dim, freezed=freeze, pre_trained=pre_trained)
     
-    # Empty, fine-tune, freeze (Comparison with other models)
     elif name == 'efficient_b0':
         model = EfficientNet_b0(add_intermediate_layer=intermediate, intermediate_dim=intermediate_dim, freezed=freeze, pre_trained=pre_trained)
 
-    # Empty, fine-tune, freeze (Comparison with other models)
     elif name == 'efficient_b4':
         model = EfficientNet_b4(add_intermediate_layer=intermediate, intermediate_dim=intermediate_dim, freezed=freeze, pre_trained=pre_trained)
     
-    # Empty, fine-tune, freeze (Comparison with other models)
     elif name == "bit":
         model = BiTModel("google/bit-50", add_intermediate_layer=intermediate, intermediate_dim=intermediate_dim, freezed=freeze, pre_trained=pre_trained)
     
-    # Empty, fine-tune, freeze (Comparison with other models)
     elif name == "vit_base":
         model = HuggingModel("google/vit-base-patch16-224", add_intermediate_layer=intermediate, intermediate_dim=intermediate_dim, freezed=freeze, pre_trained=pre_trained)
 
-    # Empty, fine-tune, freeze (Comparison with other models)
+    elif name == "vit_large":
+        model = HuggingModel("google/vit-large-patch16-224", add_intermediate_layer=intermediate, intermediate_dim=intermediate_dim, freezed=freeze, pre_trained=pre_trained)
+
+    elif name == "deit_small":
+        model = HuggingModel("facebook/deit-small-distilled-patch16-224", add_intermediate_layer=intermediate, intermediate_dim=intermediate_dim, freezed=freeze, pre_trained=pre_trained)
+
     elif name == "deit_base":
         model = HuggingModel("facebook/deit-base-distilled-patch16-224", add_intermediate_layer=intermediate, intermediate_dim=intermediate_dim, freezed=freeze, pre_trained=pre_trained)
 
-    # Empty, fine-tune, freeze (Comparison with other models)
     elif name == "coatnet":
         model = CoatNetModel('coatnet_0_rw_224.sw_in1k', add_intermediate_layer=intermediate, intermediate_dim=intermediate_dim, freezed=freeze, pre_trained=pre_trained)
 
-    # Empty, fine-tune, freeze (Comparison with other models)
     elif name == "resnext":
         model = ResNextModel('resnext101_32x8d', add_intermediate_layer=intermediate, intermediate_dim=intermediate_dim, freezed=freeze, pre_trained=pre_trained) 
 
-    # Empty, fine-tune, freeze (Comparison with other models)
     elif name == 'beit':
         model = HuggingModel("microsoft/beit-base-patch16-224", add_intermediate_layer=intermediate, intermediate_dim=intermediate_dim, freezed=freeze, pre_trained=pre_trained)
 
-    # Empty, fine-tune, freeze (Comparison with other models)
     elif name == 'convnext':
         model = ConvNeXt_base(add_intermediate_layer=intermediate, intermediate_dim=intermediate_dim, freezed=freeze, pre_trained=pre_trained)
 
-    # Empty, fine-tune, freeze (Comparison with other models)
     elif name == 'regnet':
         model = RegNetModel('regnet_y_400mf', add_intermediate_layer=intermediate, intermediate_dim=intermediate_dim, freeze=freeze, pre_trained=pre_trained)
 
-    # Forensics++, Voting, ... Best model so far so used multiple times and compared to all the others
     elif name == 'swin_tiny':
         model = HuggingModel("microsoft/swin-tiny-patch4-window7-224", add_intermediate_layer=intermediate, intermediate_dim=intermediate_dim, freezed=freeze, pre_trained=pre_trained)
 
-# --------- --------- --------- --------- --------- --------- --------- --------- --------- --------- --------- --------- --------- --------- --------- --------- --------- --------- 
-
     elif name == 'swin_base':
-        model = HuggingModel("microsoft/swin-base-patch4-window7-224")
+        model = HuggingModel("microsoft/swin-base-patch4-window7-224",  add_intermediate_layer=intermediate, intermediate_dim=intermediate_dim, freezed=freeze, pre_trained=pre_trained)
 
-    # A bit too big so not used as much... Overfits a lot.
     elif name == 'swin_large':
-        model = HuggingModel("microsoft/swinv2-large-patch4-window12to16-192to256-22kto1k-ft")
-
-    elif name == "vit_large":
-        model = HuggingModel("google/vit-large-patch16-224")
-
-    elif name == "deit_small":
-        model = HuggingModel("facebook/deit-small-distilled-patch16-224")
-
-    elif name == "imagegpt_small":
-        model = HuggingModel(base_mod_name='openai/imagegpt-small')
+        model = HuggingModel("microsoft/swinv2-large-patch4-window12to16-192to256-22kto1k-ft", add_intermediate_layer=intermediate, intermediate_dim=intermediate_dim, freezed=freeze, pre_trained=pre_trained)
     
-    elif name == "blip2":
-        # Load the processor and model
-        # processor = Blip2Processor.from_pretrained("Salesforce/blip2-opt-2.7b")
-        model = Blip2VisionModel.from_pretrained("Salesforce/blip2-opt-2.7b")
-        model = Blip2VisionForImageClassification(model)
+    # elif name == "blip2":
+    #     # Load the processor and model
+    #     # processor = Blip2Processor.from_pretrained("Salesforce/blip2-opt-2.7b")
+    #     model = Blip2VisionModel.from_pretrained("Salesforce/blip2-opt-2.7b")
+    #     model = Blip2VisionForImageClassification(model)
 
     else:
         raise ValueError("Architecture name doesn't correspond, please check utils.py for available ones.")
     return model
 
 
-class Blip2VisionForImageClassification(nn.Module):
-    def __init__(self, base_model, num_classes=1):
-        super(Blip2VisionForImageClassification, self).__init__()
-        self.base_model = base_model
-        self.classifier = nn.Linear(base_model.config.hidden_size, num_classes)
+# class Blip2VisionForImageClassification(nn.Module):
+#     def __init__(self, base_model, num_classes=1):
+#         super(Blip2VisionForImageClassification, self).__init__()
+#         self.base_model = base_model
+#         self.classifier = nn.Linear(base_model.config.hidden_size, num_classes)
         
-    def forward(self, pixel_values):
-        outputs = self.base_model(pixel_values=pixel_values)
-        pooled_output = outputs.last_hidden_state[:, 0]  # Use the CLS token
-        logits = self.classifier(pooled_output)
-        return logits
+#     def forward(self, pixel_values):
+#         outputs = self.base_model(pixel_values=pixel_values)
+#         pooled_output = outputs.last_hidden_state[:, 0]  # Use the CLS token
+#         logits = self.classifier(pooled_output)
+#         return logits
 
 
 class RegNetModel(nn.Module):

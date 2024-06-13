@@ -17,7 +17,7 @@ if __name__ == '__main__':
     val_opt = Options().parse(print_options=False)
     val_opt.isTrain = False
 
-    # Check what are the models to train on
+    # Fetches the data to train on
     data_loader = create_dataloader(opt, "train_list")
 
     print('Number of training batches is: %d' % len(data_loader))
@@ -29,15 +29,18 @@ if __name__ == '__main__':
     # Initializes model instance for training
     model = Trainer(opt)
     
-    # Change this number if you want to wait longer before seeing changes for early stopping
-    nb_epoch_patience = 5
-    early_stopping = EarlyStopping(patience=nb_epoch_patience, delta=-0.001, verbose=True)
+    nb_epoch_patience = 5 # Change this number if you want to wait longer before seeing changes for early stopping
+    delta = -0.001 # Change this if you want to consider larger/smaller changes
+    early_stopping = EarlyStopping(patience=nb_epoch_patience, delta=delta, verbose=True)
 
-    # Default number of epochs (max)    
+    # Max number of epoch
     nb_epoch = 10000
 
     # Frequency to save model (every x epochs)
     save_frequency = 20
+
+    # Frequency at which we save the loss for tensorboard
+    loss_freq = 100
 
     for epoch in range(nb_epoch):
 
@@ -58,8 +61,6 @@ if __name__ == '__main__':
             model.optimize_parameters()
             
             # Tensorboard display
-            # Here is defined the frequency at which we save the loss
-            loss_freq = 100
             if model.total_steps % loss_freq == 0:
                 print("Train loss: {} at step: {}".format(model.loss, model.total_steps))
                 train_writer.add_scalar('loss', model.loss, model.total_steps)
@@ -86,13 +87,18 @@ if __name__ == '__main__':
         early_stopping(ap, model)
 
         if early_stopping.early_stop:
+
             continue_training = model.adjust_learning_rate()
 
             # continue_training is True when learning rate doesn't fall under a threshold value
+
             if continue_training:
+                delta_ = -0.002 # Change this if you want to consider larger/smaller changes
                 print("Learning rate dropped by 10, training continues...")
-                early_stopping = EarlyStopping(patience=nb_epoch_patience, delta=-0.002, verbose=True)
+                early_stopping = EarlyStopping(patience=nb_epoch_patience, delta=delta_, verbose=True)
             else:
+                print("Early stopping, saving the latest model...")
+                model.save_networks('latest')
                 print("Early stopping.")
                 break
         

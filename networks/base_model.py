@@ -30,7 +30,7 @@ class BaseModel(nn.Module):
         if self.isTrain and not self.opt.new_optim:
             self.optimizer.load_state_dict(state_dict['optimizer'])
             
-            # Move optimizer state to GPU
+            # Move optimizer to GPU
             for state in self.optimizer.state.values():
                 for k, v in state.items():
                     if torch.is_tensor(v):
@@ -50,7 +50,7 @@ class BaseModel(nn.Module):
         save_filename = 'model_epoch_%s.pth' % epoch
         save_path = os.path.join(self.save_dir, save_filename)
 
-        # serialize model and optimizer to dict
+        # Serialize model and optimizer to dict
         state_dict = {
             'model': self.model.state_dict(),
             'optimizer' : self.optimizer.state_dict(),

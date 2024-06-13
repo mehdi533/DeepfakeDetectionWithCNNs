@@ -1,9 +1,7 @@
 import argparse
 import os
 import util
-import torch
-#import models
-#import data
+from datetime import date
 
 
 class Options():
@@ -11,57 +9,36 @@ class Options():
         self.initialized = False
 
     def initialize(self, parser):
-         
-        # What model is used to train/test
-        parser.add_argument('--arch', type=str, default='res50', help='architecture for binary classification')
+        
+        parser.add_argument('--checkpoints_dir', type=str, default='./checkpoints', help='Models trained will be saved in this directory')
+        parser.add_argument('--name', type=str, default='experiment_name', help='Name of the experiment, results saved in: checkpoints_dir, filename will be <arch>_<name>_<models>')
 
-        # Architecture options: add a layer before the last one (arXiv:2302.10174v1)
-        parser.add_argument('--intermediate', action=argparse.BooleanOptionalAction, type=bool, default=False, help='filename to save')
+        # --- What model to train ---
+        parser.add_argument('--arch', type=str, default='res50', help='choose the architecture to train for binary classification')
+
+        # --- Architecture options ---
+        parser.add_argument('--intermediate', action=argparse.BooleanOptionalAction, type=bool, default=False, help='adds a layer in the classifier (fully connected)')
         parser.add_argument('--intermediate_dim', type=int, default=64, help='Size of the intermediate dimension')
-        parser.add_argument("--freeze", action=argparse.BooleanOptionalAction, type=bool, default=False, help='freeze all layers except classifier')
-        parser.add_argument("--pre_trained", action=argparse.BooleanOptionalAction, type=bool, default=True, help='load pre trained weights')
-        parser.add_argument("--cropping", action=argparse.BooleanOptionalAction, type=bool, default=False, help='Crop images or not')
+        parser.add_argument("--freeze", action=argparse.BooleanOptionalAction, type=bool, default=False, help='option to freeze the backbone of the model')
+        parser.add_argument("--pre_trained", action=argparse.BooleanOptionalAction, type=bool, default=True, help='use the model with pre trained weights')
+        parser.add_argument("--cropping", action=argparse.BooleanOptionalAction, type=bool, default=False, help='crop images in random patches')
 
-        # Models that should be trained on (e.g: FFpp0,FFpp1 or real,ProGAN...)
-        parser.add_argument('--models', default='real', help='models to take into account')
+        # --- Models that should be trained on (e.g: FFpp0,FFpp1 or real,ProGAN...) ---
+        parser.add_argument('--models', default='real', help='Format: REALFolder,MOD1,MOD2 models/generators on which the model will be trained')
         parser.add_argument('--batch_size', type=int, default=64, help='input batch size')
 
-        # Dataset (dataroot is path to folder containing models, metadata path to folder containing train/val/test lists with subfolders real/fake)
         parser.add_argument('--dataroot', default='./dataset/', help='path to images (should contain folder with all images associated to each image generator)')
         parser.add_argument('--metadata', type=str, default='./dataset/Metadata/', help='directory with list of real/fake images')
-        
-        # Save options (directory)
-        parser.add_argument('--checkpoints_dir', type=str, default='./checkpointsMODELS', help='models are saved here')
-
-        # Number of threads depending if using izar (1) or helvetios (4 for faster testing)
         parser.add_argument('--num_threads', default=1, type=int, help='# threads for loading data')
 
-        # Adjust depending on number of generators training on to have same nb of real/fake images
         parser.add_argument('--multiply_real', type=int, default=1, help='how many times does the real data have to be multiplied by') # Eventually later
         
-        # Options for data augmentation
-        parser.add_argument('--compression', type=int, default=0)
-        parser.add_argument('--blurring', type=int, default=0)
-        parser.add_argument('--compr_prob', type=float, default=0.0)
-        parser.add_argument('--blur_prob', type=float, default=0.0)
-
-        # Name of the experiment, results save in: checkpoints_dir, filename will be <arch>_<name>_<models>
-        parser.add_argument('--name', type=str, default='experiment_name', help='name of the experiment. It decides where to store samples and models')
-
-        # parser.add_argument('--generators', default='', help='image generators to train on')
-        # parser.add_argument('--class_bal', action='store_true')
-        # parser.add_argument('--cropSize', type=int, default=224, help='then crop to this size')
-        # parser.add_argument('--filename', default='', help='filename to save')
+        # --- Options for data augmentation ---
+        parser.add_argument('--compr_prob', type=float, default=0.0, help="the percentage of images to be pre processed with compression")
+        parser.add_argument('--blur_prob', type=float, default=0.0, help="the percentage of images to be pre processed with compression")
 
         # --- Options for testing ---
-
-        # Path for testing
         parser.add_argument('--path', type=str)
-
-        # Path to folder containing all the models for multi testing
-        parser.add_argument('--models_folder_path', type=str, default="./checkpoints")
-
-        # Meta model for evaluation from multiple models
         parser.add_argument("--meta_model", action=argparse.BooleanOptionalAction, type=bool, default=False, help='meta model?')
 
         self.isTrain = False
@@ -73,27 +50,33 @@ class Options():
 
         opt = self.gather_options()
         
-        opt.isTrain = self.isTrain # Default = False
-
+        opt.isTrain = self.isTrain 
+        
+        # Prints and saves a textfile with the options used in this training
         if print_options:
             self.print_options(opt)
 
+        # The different
         opt.models = opt.models.split(',')
         
+        # Creates a list not containing real images for the name of the folder
         tmp_models = []
         for m in opt.models:
-            if m == "real" or m == "FFpp0":
+            if m == "CelebAHQ" or m == "FFpp0":
                 continue
             tmp_models.append(m)
-            
         mod = "-".join(map(str, tmp_models))
+
+        # Formatting of the filename
         opt.filename = opt.arch+'_'+opt.name+'_'+ mod
         
         self.opt = opt
+
         return self.opt
     
     def gather_options(self):
-
+        
+        # Parsing 
         if not self.initialized:
             parser = argparse.ArgumentParser(
                 formatter_class=argparse.ArgumentDefaultsHelpFormatter)
@@ -104,6 +87,7 @@ class Options():
 
         return parser.parse_args()
 
+    # Message printed and saved in opt.txt
     def print_options(self, opt):
         message = ''
         message += '----------------- Options ---------------\n'
@@ -112,11 +96,8 @@ class Options():
             default = self.parser.get_default(k)
             if v != default:
                 comment = '\t[default: %s]' % str(default)
-            message += '{:>25}: {:<30}{}\n'.format(str(k), str(v), comment)
-        # -----------------------------------------------------------------    
-        import datetime
-        message += 'Date of start: {}\n'.format(datetime.datetime.now())
-        # -----------------------------------------------------------------
+            message += '{:>25}: {:<30}{}\n'.format(str(k), str(v), comment)  
+        message += 'The date is: {}\n'.format(date.today())
         message += '----------------- End -------------------'
         print(message)
 
