@@ -29,8 +29,7 @@ pip install -r requirements.txt
 
 The datasets in the same format used for this study are available on the [MMSPG page](https://www.epfl.ch/labs/mmspg/downloads/ai-synthesized-human-face-dataset/).
 
-The images of a specific generator (e.g. ProGAN) are all located in the same folder, the correct images for training, validation, and testing, are selected by loading the lists of images in the metadata folder. The emplacement of the Metadata folder has to be passed by argument, the default sets it in generated-image-detection/data.
-
+The images of a specific generator (e.g. ProGAN) are all located in the same folder, the correct images for training, validation, and testing, are selected by loading the lists of images in the metadata folder. The emplacement of the Metadata folder has to be passed by argument, by default it is set as generated-image-detection/data/metadata.
 <br>The format in which the metadata is stored has to be similar to this:
 
 ```
