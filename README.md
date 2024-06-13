@@ -24,6 +24,7 @@ The required libraries are in the requirements.txt file and can be installed usi
 ```python
 pip install -r requirements.txt
 ```
+---
 
 ### Datasets
 
@@ -83,7 +84,10 @@ The images of a specific generator (e.g. ProGAN) are all located in the same fol
 
 ---
 
-### Training
+### Train a model
+
+To train a model, a lot of options are available:
+
 
 In order to train your models you simply have to run, one command, which selects the augmentations, pre-processings, frequency transformations and datasets to run. The command with the settings that achieved our two best results, were:
 ```
@@ -94,13 +98,24 @@ python train.py --name progan_pndm_bj_fft --fft --blur_prob 0.5 --blur_sig 0.0,3
 python train.py --name progan_pndm_bj_fft_lp --low_pass --fft --blur_prob 0.5 --blur_sig 0.0,3.0 --jpg_prob 0.5 --jpg_method cv2,pil --jpg_qual 30,100 --dataroot ./dataset/
 ```
 The possible flag options we propose are:
-- `--fft`: Fast Fourier Transform (transform)
-- `--dct`: Discrete Cosine Transform (transform)
-- `--high_pass`: High Pass filter (pre-processing)
-- `--thresh`: Thresholding (to be selected only if `--high_pass` is selected)
-- `--low_pass`: Low Pass filter (pre-processing)
-- `--edge`: Edge Detection (pre-processing)
-- `--sharp_edge`: Sharp Edge Detection (pre-processing)
+- `--name`: The name of the experiment
+- `--arch`: Fast Fourier Transform (transform)
+- `--intermediate`: Discrete Cosine Transform (transform)
+- `--intermediate_dim`: High Pass filter (pre-processing)
+- `--freeze`: Thresholding (to be selected only if `--high_pass` is selected)
+- `--pre_trained`: Low Pass filter (pre-processing)
+- `--models`: Sharp Edge Detection (pre-processing)
+- `--multiply_real`: Sharp Edge Detection (pre-processing)
+- `--batch_size`: Sharp Edge Detection (pre-processing)
+- `--dataroot`: Sharp Edge Detection (pre-processing)
+- `--metadata`: Sharp Edge Detection (pre-processing)
+- `--checkpoints_dir`: Sharp Edge Detection (pre-processing)
+- `--num_threads`: Sharp Edge Detection (pre-processing)
+- `--cropping`: Edge Detection (pre-processing)
+- `--compression`: Edge Detection (pre-processing)
+- `--compr_pron`: Edge Detection (pre-processing)
+- `--blurring`: Edge Detection (pre-processing)
+- `--blur_prob`: Edge Detection (pre-processing)
 
 > The definition of these transformations/pre-processings can be found in `data/datasets.py`.
 
