@@ -17,8 +17,8 @@ For this research, the main focus was to gather useful insights for the generali
 ### Getting started
 
 ```python
-git clone https://github.com/mehdi533/XXXXXXX
-cd XXXXXXXXX
+git clone https://github.com/mehdi533/Deepfake-Detection
+cd Deepfake-Detection/
 ```
 The required libraries are in the requirements.txt file and can be installed using the command
 ```python
