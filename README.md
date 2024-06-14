@@ -164,7 +164,7 @@ The different architectures that you can train on using this code are the follow
 - `deit_base` [Distilled Data-efficient Image Transformer (base-sized model)](https://huggingface.co/facebook/deit-base-distilled-patch16-224)
 - `coatnet` [CoAtNet](https://huggingface.co/timm/coatnet_0_rw_224.sw_in1k)
 - `resnext` [ResNeXt](https://huggingface.co/timm/resnext101_32x8d.tv_in1k)
-- `beit` [BEiT (base-sized model](https://huggingface.co/microsoft/beit-base-patch16-224)
+- `beit` [BEiT (base-sized model)](https://huggingface.co/microsoft/beit-base-patch16-224)
 - `convnext` [ConvNeXt](https://pytorch.org/vision/main/models/convnext.html)
 - `regnet` [RegNetY-400MF](https://pytorch.org/vision/main/models/generated/torchvision.models.regnet_y_400mf.html#torchvision.models.regnet_y_400mf)
 - `swin_tiny` [Swin Transformer (tiny version)](https://huggingface.co/microsoft/swin-tiny-patch4-window7-224)
