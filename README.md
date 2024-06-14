@@ -1,12 +1,12 @@
 # Exploring Diffusion-Generated Image Detection Methods
 
-Research done by: Mehdi Abdallahi
-<br>Supervisor: Yuhang Lu
-<br>Professor: Dr. Touradj Ebrahimi
+Research done by: [Mehdi Abdallahi](https://www.linkedin.com/in/mehdi-abdallahi/?originalSubdomain=es)
+<br>Supervisor: [Yuhang Lu](https://scholar.google.com/citations?hl=en&user=CtNglVsAAAAJ&view_op=list_works&sortby=pubdate)
+<br>Professor: [Dr. Touradj Ebrahimi](https://scholar.google.com/citations?user=jt-UsrcAAAAJ&hl=en)
 
 ---
 
-The content of this repository was used for the research done during the second semester of my Master's on the detection of diffusion-generated images, the code is adapted from the paper [CNN-generated images are surprisingly easy to spot... for now](https://arxiv.org/pdf/1912.11035.pdf) published by Wang et al. in 2020, and the code they used can be found in this [repository](https://github.com/peterwang512/CNNDetection). The [report]() and [presentation]() of this project are available.
+The content of this repository contains the material used for the research done during the second semester of my Master's at EPFL on the detection of diffusion-generated images, the code is adapted from the paper [CNN-generated images are surprisingly easy to spot... for now](https://arxiv.org/pdf/1912.11035.pdf) published by Wang et al. in 2020, and the code they used can be found in this [repository](https://github.com/peterwang512/CNNDetection). Click here for the [report]() and [presentation slides]() of this project. The trainings I did were done on the [izar](https://www.epfl.ch/research/facilities/scitas/hardware/izar/) cluster at EPFL using slurm commands.
 
 ---
 
@@ -66,6 +66,8 @@ The images of a specific generator (e.g. ProGAN) are all located in the same fol
 
 ```
 
+X,Y,A, and B represent names of folders in which images are stored, they need to correspond for the fetching of the image path to be done properly.
+
 <br>For the images, they have to be stored like this:
 ```
 ├── data
@@ -75,7 +77,7 @@ The images of a specific generator (e.g. ProGAN) are all located in the same fol
 │   ├── DDIM
 │   │   ├── 00000.png
 │   │   ├── ...
-│   ├── DDPM
+│   ├── CelebA-HQ
 │   │   ├── 00000.png
 │   │   ├── ...
 ```
@@ -86,88 +88,96 @@ The images of a specific generator (e.g. ProGAN) are all located in the same fol
 
 ### Train a model
 
-To train a model, a lot of options are available:
+![image](https://github.com/mehdi533/VisiumHackaton/assets/113531778/44be5b6e-2ca5-463d-9b36-cb394223f3cc)
 
+To train a model, there are a lot of options available. 
 
-In order to train your models you simply have to run, one command, which selects the augmentations, pre-processings, frequency transformations and datasets to run. The command with the settings that achieved our two best results, were:
-```
-# FFT
-python train.py --name progan_pndm_bj_fft --fft --blur_prob 0.5 --blur_sig 0.0,3.0 --jpg_prob 0.5 --jpg_method cv2,pil --jpg_qual 30,100 --dataroot ./dataset/
-
-# FFT + Low-Pass
-python train.py --name progan_pndm_bj_fft_lp --low_pass --fft --blur_prob 0.5 --blur_sig 0.0,3.0 --jpg_prob 0.5 --jpg_method cv2,pil --jpg_qual 30,100 --dataroot ./dataset/
-```
 The possible flag options we propose are:
-- `--name`: The name of the experiment
-- `--arch`: Fast Fourier Transform (transform)
-- `--intermediate`: Discrete Cosine Transform (transform)
-- `--intermediate_dim`: High Pass filter (pre-processing)
-- `--freeze`: Thresholding (to be selected only if `--high_pass` is selected)
-- `--pre_trained`: Low Pass filter (pre-processing)
-- `--models`: Sharp Edge Detection (pre-processing)
-- `--multiply_real`: Sharp Edge Detection (pre-processing)
-- `--batch_size`: Sharp Edge Detection (pre-processing)
-- `--dataroot`: Sharp Edge Detection (pre-processing)
-- `--metadata`: Sharp Edge Detection (pre-processing)
-- `--checkpoints_dir`: Sharp Edge Detection (pre-processing)
-- `--num_threads`: Sharp Edge Detection (pre-processing)
-- `--cropping`: Edge Detection (pre-processing)
-- `--compression`: Edge Detection (pre-processing)
-- `--compr_pron`: Edge Detection (pre-processing)
-- `--blurring`: Edge Detection (pre-processing)
-- `--blur_prob`: Edge Detection (pre-processing)
+- `--checkpoints_dir`: models trained will be saved in this directory
+- `--name`: the name of the experiment, the results will be saved in: checkpoints_dir, filename will be <arch>_<name>_<models>
+- `--arch`: architecture of the model (check list below for available ones)
+- `--intermediate`: adds a fully connected layer in the classifier (use when training with frozen backbone)
+- `--intermediate_dim`: the dimension of the added layer
+- `--freeze`: option to freeze the backbone of the model
+- `--pre_trained`: use the model with pre trained weights
+- `--models`: models/generators on which the model will be trained (e.g. CelebA-HQ,ProGAN,DDIM)
+- `--multiply_real`: to upsample the real class, the amount of real images will be multiplied by this amount
+- `--batch_size`: the batch size
+- `--dataroot`: the path to the folder containing the different images from the different generators (e.g. the path to "data" presented when showing how the images should be stored) 
+- `--metadata`: the path to the folder containing the metadata as shown above.
+- `--num_threads`: the number of threads to use 
+- `--cropping`: crop images in random patches
+- `--compr_prob`: the percentage of images to be pre processed with compression
+- `--blur_prob`: the percentage of images to be pre processed with blurring
 
-> The definition of these transformations/pre-processings can be found in `data/datasets.py`.
+You simply have to run a command with your chosen options, use the different flags to have the different modes of training (fine-tuning by default, freeze and add a fully connected layer for frozen backbone, set pre-trained to false to train newly initialized layers):
 
-*Note: that only one transformation can be used at once (pre-processings could be used together)*
+```python
+# ResNet50
+python train.py --arch res50 --name 1106 --pre_trained --multiply_real 2 --batch_size 256 --blur_prob 0.3 --models real,DDIM,ProGAN --checkpoints_dir ./checkpoints/ --dataroot ./dataset/ --metadata ./dataset/metadata/
 
-The model resulting from the training will be stored in the `/checkpoints` folder. 
+# Swin Tiny
+python train.py --arch swin_tiny --name 1206 --pre_trained --batch_size 256 --blur_prob 0.1 --models CelebAHQ,FFpp0,FFpp1,ProGAN --checkpoints_dir ./checkpoints/ --dataroot ./dataset/ --metadata ./dataset/metadata/
+```
+
+The details of the implementation (optimizer, learning rate scheduler...) can be found in the [report](XXX). 
 
 ---
 
-### Evaluation 
+### Testing
 
-To evaluate a model, the file named `eval_config.py` has to be modified. The `dataroot` variable should contain the path to the test folder, the `vals` variable should be a list containing the names of the datasets to be evaluated (subdirectories of test) and the `model_path` variable should contain the path to the weights of the model that has to be evaluated (`*.pth` file).
+To test a model, the way of doing is similar, the options listed below are available:
+- `--path`: path to the model (.pth) or to multiple models if using the model ensemble
+- `--name`: the name of the experiment, the results will be saved in 
+- `--intermediate`: adds a fully connected layer in the classifier (use when training with frozen backbone)
+- `--intermediate_dim`: the dimension of the added layer
+- `--batch_size`: the batch size
+- `--dataroot`: the path to the folder containing the different images from the different generators (e.g. the path to "data" presented when showing how the images should be stored) 
+- `--metadata`: the path to the folder containing the metadata as shown above.
+- `--num_threads`: the number of threads to use
+- `--meta_model`: option to train a model on the validation set to optimize the weights for the vote of the models (LR or kNN).
+- `--models`: models/generators on which the meta model will be trained (e.g. CelebA-HQ,ProGAN,DDIM)
 
-When these are configured, we can start the evaluation. We can run the command below:
+To change the directory to save the results, check the util.py file. The intermediate and intermediate_dim are mendatory to use when testing a model that was trained using those flags. The default meta model is none, to choose one put LR for linear regression or kNN for k Nearest Neighbors in the --meta_model flag, if you want to change the numbers of neighbors, the distance metric or other, you will have to do so manually in the model_ensemble.py file.
+
+To evaluate a model, you simply have to run a command with your chosen options:
+```python
+# Simple evaluation of a model
+python eval.py --name testFFpp3 --batch_size 256 --path swin_tiny_0506_FFpp3/model_epoch_best.pth
+
+# With Model Ensemble
+python eval.py --name LRtest --batch_size 256 --meta_model LR --path trained/swin_tiny_Forensics --models FFpp0,FFpp1,FFpp2,FFpp3 --num_threads 8
 ```
-# FFT
-python eval.py --fft
+---
 
-# FFT + Low-Pass
-python eval.py --fft --low_pass
-```
-_**Important:** make sure that the pre-processing and the transformations of the evaluation are the same as the ones used to train the concerned model (don't include the augmentations)._
+### Models available 
 
-The results of the evaluation will appear in the cmd as well as in the `results` folder.
-
-You can download the models proposed by Wang et al. and evaluate them on your datasets for a quick test. The models can be downloaded running this command:
-```
-bash weights/download_weights.sh
-```
+The different architectures that you can train on using this code are the following, the value to pass with the `--arch` flag is given first:
+- `res50` [ResNet50](https://pytorch.org/vision/main/models/generated/torchvision.models.resnet50.html)
+- `vgg16` [VGG16](https://pytorch.org/vision/main/models/generated/torchvision.models.vgg16.html)
+- `efficient_b0` [EfficientNet b0](https://pytorch.org/vision/main/models/generated/torchvision.models.efficientnet_b0.html)
+- `efficient_b4` [EfficientNet b4](https://pytorch.org/vision/main/models/generated/torchvision.models.efficientnet_b4.html)
+- `bit` [Big Transfer](https://huggingface.co/google/bit-50)
+- `vit_base` [Vision Transformer (base size)](https://huggingface.co/google/vit-base-patch16-224)
+- `vit_large` [Vision Transformer (large size)](https://huggingface.co/google/vit-large-patch16-224)
+- `deit_small`[Distilled Data-efficient Image Transformer (small-sized model)](https://huggingface.co/facebook/deit-small-distilled-patch16-224)
+- `deit_base` [Distilled Data-efficient Image Transformer (base-sized model)](https://huggingface.co/facebook/deit-base-distilled-patch16-224)
+- `coatnet` [CoAtNet](https://huggingface.co/timm/coatnet_0_rw_224.sw_in1k)
+- `resnext` [ResNeXt](https://huggingface.co/timm/resnext101_32x8d.tv_in1k)
+- `beit` [BEiT (base-sized model](https://huggingface.co/microsoft/beit-base-patch16-224)
+- `convnext` [ConvNeXt](https://pytorch.org/vision/main/models/convnext.html)
+- `regnet` [RegNetY-400MF](https://pytorch.org/vision/main/models/generated/torchvision.models.regnet_y_400mf.html#torchvision.models.regnet_y_400mf)
+- `swin_tiny` [Swin Transformer (tiny version)](https://huggingface.co/microsoft/swin-tiny-patch4-window7-224)
+- `swin_base` [Swin Transformer (base version)](https://huggingface.co/microsoft/swin-base-patch4-window7-224)
+- `swin_large` [Swin Transformer (large version)](https://huggingface.co/microsoft/swinv2-large-patch4-window12to16-192to256-22kto1k-ft)
 
 ---
-### Frequency Heatmaps and Spectra
 
-The frequency heatmaps and spectra that can be found in the report and the presentation can be obtained by running the scripts in the `heatmap_spectra_generation` folder. To be able to run this with your own datasets, you will need to add your dataset in the `datasets` dictionary and also inlude it in the argument parser in the possible choices of datasets.
+### Custom models and datasets
 
-To create a frequency heatmap the only required argument is the dataset to be analyzed (for the high-pass script there is the possibility to use a threshold or not, the default option is a threshold of 1).
+If you are planning on using a new architecture, add it in the custom_models.py file and update the list in util.py. For new datasets, also add the name in the list if you want your models to be evaluated on it, ensure that they follow the same standards as mentionned in this readme, otherwise you will have to adapt the code to ensure a smooth running of the training/evaluation process.
 
-```
-python heatmap_spectra_generation/hp_heatmap.py --dataset progan --no_thresh
-```
-
-Example of call:
-
-```python
-python train.py --arch swin_tiny --name 1405_print --no-intermediate --batch_size 256 --models real,ProGAN,DDIM
-```
-
-
-
-
-Example of call:
-
-```python
-python train.py --arch swin_tiny --name 1405_print --no-intermediate --batch_size 256 --models real,ProGAN,DDIM
-```
+---
+## Acknowledgements
+For the [dataset](https://www.epfl.ch/labs/mmspg/downloads/ai-synthesized-human-face-dataset/) and the directives during the project: [Yuhang Lu](https://scholar.google.com/citations?user=CtNglVsAAAAJ&hl=en).
+<br>For the code: the [github](https://github.com/peterwang512/CNNDetection) of Peter Wang.
