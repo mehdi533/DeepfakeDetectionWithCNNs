@@ -1,10 +1,11 @@
 ----------------- Options ---------------
-                     arch: swin_tiny                     	[default: res50]
-               batch_size: 256                           	[default: 64]
+                     arch: convnext                      	[default: res50]
+               batch_size: 128                           	[default: 64]
                  blurring: 0                             
-          checkpoints_dir: ./checkpointsMODELS           
+          checkpoints_dir: ../../../scratch/izar/abdallah/CONVNEXT/	[default: ./checkpointsMODELS]
               compression: 0                             
                  dataroot: ./dataset/                    
+                   freeze: False                         
              intermediate: False                         
          intermediate_dim: 64                            
                   isTrain: False                         	[default: None]
@@ -12,8 +13,9 @@
                    models: real,ProGAN                   	[default: real]
        models_folder_path: ./checkpoints                 
             multiply_real: 1                             
-                     name: 0106                          	[default: experiment_name]
+                     name: finetune_0706                 	[default: experiment_name]
               num_threads: 1                             
                      path: None                          
-Date of start: 2024-06-01 21:23:55.600857
+              pre_trained: True                          
+Date of start: 2024-06-07 09:21:25.038340
 ----------------- End -------------------

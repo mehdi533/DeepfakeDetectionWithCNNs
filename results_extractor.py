@@ -41,7 +41,7 @@ text = dict.fromkeys(test, '')
 # for filename in os.listdir(dir):
 
 # filename = "/home/abdallah/Deepfake-Detection/results/VOTING_DDIMPROGAN_swin-ProGAN_swin-DDIM_swin-ProGAN-DDIM.csv"
-filename = "/home/abdallah/Deepfake-Detection/results/0606_swin_tiny-FFpp1-FFpp2-FFpp3.csv"
+filename = "/home/abdallah/Deepfake-Detection/results/ffpp3_progan_swin-FFpp3_swin-ProGAN.csv"
 # /home/abdallah/Deepfake-Detection/results/VOTING_FFPP123_swin-FFpp3_swin-FFpp2_swin-FFpp1.csv
 # /home/abdallah/Deepfake-Detection/results/0606_swin_tiny-FFpp1-FFpp2-FFpp3.csv
 print(filename)
@@ -70,9 +70,17 @@ for model_test in test:
   text[model_test] += f"{tmp['Avg. precision'].loc[model_test]*100:.2f}"# / {tmp['AUC'].loc[model_test]*100:.2f}"
     # AP / AUC & AP / AUC & AP / AUC
 
-GANS = text["VQGAN"] + " & " + text["StyleGAN"] + " & " + text["VQGAN"] + ' & ' + text["DDIM"] + " & " + text["DDPM"] + " & " + text["PNDM"] + " & " +  text["LDM"]
+
+GANS = ["VQGAN", "StyleGAN", "VQGAN", "DDIM", "DDPM", "PNDM"]
+FFpps = ["FFpp1", "FFpp2", "FFpp3", "FFpp4"]
+import numpy as np
+mean_gan = np.array([float(text[gan]) for gan in GANS])
+mean_gan = np.mean(mean_gan)
+mean_fp = np.array([float(text[fp]) for fp in FFpps])
+mean_fp = np.mean(mean_fp)
+GANS = text["VQGAN"] + " & " + text["StyleGAN"] + " & " + text["VQGAN"] + ' & ' + text["DDIM"] + " & " + text["DDPM"] + " & " + text["PNDM"] + " & " +  text["LDM"] + " & " + str(mean_gan)
 # DMs
-FFpps = text["FFpp1"] + " & " + text["FFpp2"] + " & " + text["FFpp3"] + " & " +  text["FFpp4"]
+FFpps = text["FFpp1"] + " & " + text["FFpp2"] + " & " + text["FFpp3"] + " & " +  text["FFpp4"] + " & " + str(mean_fp)
 
 print(GANS)
 # print(DMs)

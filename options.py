@@ -39,7 +39,7 @@ class Options():
 
         # --- Options for testing ---
         parser.add_argument('--path', type=str)
-        parser.add_argument("--meta_model", action=argparse.BooleanOptionalAction, type=bool, default=False, help='meta model?')
+        parser.add_argument('--meta_model', type=str, default='average', help='choose between "average" (default), "kNN", "LR": use a meta model for the model ensemble')
 
         self.isTrain = False
         self.initialized = True

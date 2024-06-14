@@ -91,7 +91,7 @@ def eval_voting(path_list, exp_name, opt):
         if "FFpp" in test_model:
             opt.models = [test_model, "FFpp0"]
         else: 
-            opt.models = [test_model, "real"]
+            opt.models = [test_model, "CelebAHQ"]
 
         data_loader = create_dataloader(opt, "test_list")
         y_true, y_pred = detector.synth_real_detector(data_loader)

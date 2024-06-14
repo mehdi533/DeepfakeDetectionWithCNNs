@@ -1,7 +1,7 @@
 import os
 import torch
-from data.datasets import get_dataset_metadata
-from data.sampling import *
+from dataloader.datasets import get_dataset_metadata
+from dataloader.sampling import *
 
 
 def get_dataset_from_txt(opt, mode):
