@@ -113,11 +113,14 @@ The possible flag options we propose are:
 You simply have to run a command with your chosen options, use the different flags to have the different modes of training (fine-tuning by default, freeze and add a fully connected layer for frozen backbone, set pre-trained to false to train newly initialized layers):
 
 ```python
-# ResNet50
+# ResNet50 (Fine-tuning)
 python train.py --arch res50 --name 1106 --pre_trained --multiply_real 2 --batch_size 256 --blur_prob 0.3 --models real,DDIM,ProGAN --checkpoints_dir ./checkpoints/ --dataroot ./dataset/ --metadata ./dataset/metadata/
 
-# Swin Tiny
-python train.py --arch swin_tiny --name 1206 --pre_trained --batch_size 256 --blur_prob 0.1 --models CelebAHQ,FFpp0,FFpp1,ProGAN --checkpoints_dir ./checkpoints/ --dataroot ./dataset/ --metadata ./dataset/metadata/
+# Swin Tiny (Frozen backbone)
+python train.py --arch swin_tiny --name 1206 --freeze --intermediate --pre_trained --batch_size 256 --blur_prob 0.1 --models CelebAHQ,FFpp0,FFpp1,ProGAN --checkpoints_dir ./checkpoints/ --dataroot ./dataset/ --metadata ./dataset/metadata/
+
+# Big Transfer (Training newly initialized layers)
+python train.py --arch bit --name 1206 --no-pre_trained --batch_size 256 --blur_prob 0.1 --models CelebAHQ,FFpp0,FFpp1,ProGAN --checkpoints_dir ./checkpoints/ --dataroot ./dataset/ --metadata ./dataset/metadata/
 ```
 
 The details of the implementation (optimizer, learning rate scheduler...) can be found in the [report](XXX). 
