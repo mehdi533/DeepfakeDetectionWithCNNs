@@ -6,7 +6,7 @@ Research done by: [Mehdi Abdallahi](https://www.linkedin.com/in/mehdi-abdallahi/
 
 ---
 
-The content of this repository contains the material used for the research done during the second semester of my Master's at EPFL on the detection of diffusion-generated images, the code is adapted from the paper [CNN-generated images are surprisingly easy to spot... for now](https://arxiv.org/pdf/1912.11035.pdf) published by Wang et al. in 2020, and the code they used can be found in this [repository](https://github.com/peterwang512/CNNDetection). Click here for the [report](https://github.com/mehdi533/Deepfake-Detection/blob/main/Exploring_Diffusion_Generated_Image_Detection_Methods.pdf) and [presentation slides](https://github.com/mehdi533/Deepfake-Detection/blob/main/FinalPresentation.pdf) of this project. The trainings I did were done on the [izar](https://www.epfl.ch/research/facilities/scitas/hardware/izar/) cluster at EPFL using slurm commands.
+The content of this repository contains the material used for the research done during the second semester of my Master's at EPFL on the detection of diffusion-generated images, the code is adapted from the paper [CNN-generated images are surprisingly easy to spot... for now](https://arxiv.org/pdf/1912.11035.pdf) published by Wang et al. in 2020, and the code they used can be found in this [repository](https://github.com/peterwang512/CNNDetection). Click here for the [report](https://github.com/mehdi533/Deepfake-Detection/blob/main/Exploring_Diffusion_Generated_Image_Detection_Methods.pdf) and [presentation slides](https://github.com/mehdi533/Deepfake-Detection/blob/main/FinalPresentation.pdf) of this project. The trainings I did were done on the [izar](https://www.epfl.ch/research/facilities/scitas/hardware/izar/) cluster at EPFL.
 
 ---
 
@@ -183,4 +183,4 @@ If you are planning on using a new architecture, add it in the custom_models.py 
 ---
 ## Acknowledgements
 For the [dataset](https://www.epfl.ch/labs/mmspg/downloads/ai-synthesized-human-face-dataset/) and the directives during the project: [Yuhang Lu](https://scholar.google.com/citations?user=CtNglVsAAAAJ&hl=en).
-<br>For the code: the [github](https://github.com/peterwang512/CNNDetection) of Peter Wang.
+<br>For the code: the [github](https://github.com/peterwang512/CNNDetection) of Peter Wang licensed under CC BY-NC-SA 4.0.
