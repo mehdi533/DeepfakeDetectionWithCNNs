@@ -88,8 +88,6 @@ X,Y,A, and B represent names of folders in which images are stored, they need to
 
 ### Train a model
 
-![image](https://github.com/mehdi533/Fake_Images_Detection/assets/pipeline.png)
-
 To train a model, there are a lot of options available. 
 
 The possible flag options we propose are:
