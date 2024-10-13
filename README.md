@@ -88,7 +88,7 @@ X,Y,A, and B represent names of folders in which images are stored, they need to
 
 ### Train a model
 
-![image](https://github.com/mehdi533/VisiumHackaton/assets/113531778/44be5b6e-2ca5-463d-9b36-cb394223f3cc)
+![image](https://github.com/mehdi533/Fake_Images_Detection/assets/pipeline.png)
 
 To train a model, there are a lot of options available. 
 
